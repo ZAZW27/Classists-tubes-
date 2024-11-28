@@ -3,7 +3,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from PySide6.QtSvg import *
-from .taskbar import TaskBar
+from .components.taskbar import TaskBar
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -42,6 +42,7 @@ class Ui_MainWindow(object):
         self.mainScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.mainScroll.setWidgetResizable(True)
         self.wrapper = QWidget()
+        
         self.wrapper.setObjectName(u"wrapper")
         self.wrapper.setGeometry(QRect(0, 0, 679, 1037))
         self.gridLayout = QGridLayout(self.wrapper)
@@ -541,67 +542,8 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2.addWidget(self.mainScroll, 0, 0, 1, 1)
 
-        # self.task_bar = QFrame(self.centralwidget)
-        self.task_bar = QFrame(self.centralwidget)
-        self.task_bar.setObjectName(u"task_bar")
-        self.task_bar.setMinimumSize(QSize(0, 68))
-        self.task_bar.setMaximumSize(QSize(16777215, 90))
-        self.task_bar.setStyleSheet(u"background: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgb(52, 211, 153), stop:1 rgb(110, 231, 183));\n"
-"border-radius: 20px;")
-        self.task_bar.setFrameShape(QFrame.StyledPanel)
-        self.task_bar.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_3 = QHBoxLayout(self.task_bar)
-        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.Task_frame_1 = QFrame(self.task_bar)
-        self.Task_frame_1.setObjectName(u"Task_frame_1")
-        self.Task_frame_1.setMinimumSize(QSize(55, 55))
-        self.Task_frame_1.setMaximumSize(QSize(55, 55))
-        self.Task_frame_1.setStyleSheet(u"background: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgb(67, 202, 153), stop:1 rgb(122, 250, 200));\n"
-"\n"
-"border-radius:  25px;")
-        self.Task_frame_1.setFrameShape(QFrame.StyledPanel)
-        self.Task_frame_1.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_6 = QHBoxLayout(self.Task_frame_1)
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.Task_1 = QLabel(self.Task_frame_1)
-        self.Task_1.setObjectName(u"Task_1")
-        self.Task_1.setMinimumSize(QSize(40, 40))
-        self.Task_1.setMaximumSize(QSize(40, 40))
-        self.Task_1.setStyleSheet(u"background: rgba(255, 255, 255, 0);")
-        self.Task_1.setPixmap(QPixmap(u"resources/icons/dashboard.svg"))
-        self.Task_1.setScaledContents(True)
-
-        self.horizontalLayout_6.addWidget(self.Task_1)
-
-
-        self.horizontalLayout_3.addWidget(self.Task_frame_1)
-
-        self.Task_frame_2 = QFrame(self.task_bar)
-        self.Task_frame_2.setObjectName(u"Task_frame_2")
-        self.Task_frame_2.setMinimumSize(QSize(55, 55))
-        self.Task_frame_2.setMaximumSize(QSize(55, 55))
-        self.Task_frame_2.setStyleSheet(u"background: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgb(67, 202, 153), stop:1 rgb(122, 250, 200));\n"
-"\n"
-"border-radius:  25px;")
-        self.Task_frame_2.setFrameShape(QFrame.StyledPanel)
-        self.Task_frame_2.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_8 = QHBoxLayout(self.Task_frame_2)
-        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.Task_2 = QLabel(self.Task_frame_2)
-        self.Task_2.setObjectName(u"Task_2")
-        self.Task_2.setMinimumSize(QSize(40, 40))
-        self.Task_2.setMaximumSize(QSize(40, 40))
-        self.Task_2.setStyleSheet(u"background: rgba(255, 255, 255, 0);")
-        self.Task_2.setPixmap(QPixmap(u"resources/icons/dashboard.svg"))
-        self.Task_2.setScaledContents(True)
-
-        self.horizontalLayout_8.addWidget(self.Task_2)
-
-
-        self.horizontalLayout_3.addWidget(self.Task_frame_2)
-
-
-        self.gridLayout_2.addWidget(TaskBar, 1, 0, 1, 1)
+        task_bar = TaskBar(MainWindow)
+        self.gridLayout_2.addWidget(task_bar, 1, 0, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusBar = QStatusBar(MainWindow)
@@ -621,11 +563,5 @@ class Ui_MainWindow(object):
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Jangan lupa hari ini ada kuis kalkulus yaawh", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Jangan lupa laprak kimia dikumpul", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Classes", None))
-#if QT_CONFIG(accessibility)
         self.course_wrapper.setAccessibleName("")
-#endif // QT_CONFIG(accessibility)
         self.new_course_btn.setText(QCoreApplication.translate("MainWindow", u"Tambah kelas", None))
-        pixmap = QPixmap("tasks.svg")
-        self.Task_1.setPixmap(QPixmap(pixmap))
-        self.Task_2.setText("")
-    # retranslateUi

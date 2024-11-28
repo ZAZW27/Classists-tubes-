@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'design2OSKJFS.ui'
+## Form generated from reading UI file 'design2NgqjnN.ui'
 ##
 ## Created by: Qt User Interface Compiler version 5.15.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
+import os
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-
+from PySide6.QtSvg import *
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -51,7 +52,7 @@ class Ui_MainWindow(object):
         self.mainScroll.setWidgetResizable(True)
         self.wrapper = QWidget()
         self.wrapper.setObjectName(u"wrapper")
-        self.wrapper.setGeometry(QRect(0, -249, 683, 1027))
+        self.wrapper.setGeometry(QRect(0, 0, 679, 1037))
         self.gridLayout = QGridLayout(self.wrapper)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setHorizontalSpacing(0)
@@ -106,7 +107,7 @@ class Ui_MainWindow(object):
         self.map_scroll.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 650, 334))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 650, 333))
         self.map_scroll.setWidget(self.scrollAreaWidgetContents)
 
         self.gridLayout_3.addWidget(self.map_scroll, 0, 0, 1, 1)
@@ -203,7 +204,7 @@ class Ui_MainWindow(object):
         self.assignments_scroll.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
         self.ass_scroll_grid = QWidget()
         self.ass_scroll_grid.setObjectName(u"ass_scroll_grid")
-        self.ass_scroll_grid.setGeometry(QRect(0, 0, 632, 55))
+        self.ass_scroll_grid.setGeometry(QRect(0, 0, 628, 60))
         self.horizontalLayout_4 = QHBoxLayout(self.ass_scroll_grid)
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.Assignments_7 = QWidget(self.ass_scroll_grid)
@@ -272,7 +273,7 @@ class Ui_MainWindow(object):
         self.note_scroll.setWidgetResizable(True)
         self.note_scroll_grid = QWidget()
         self.note_scroll_grid.setObjectName(u"note_scroll_grid")
-        self.note_scroll_grid.setGeometry(QRect(0, 0, 650, 225))
+        self.note_scroll_grid.setGeometry(QRect(0, 0, 651, 222))
         self.gridLayout_5 = QGridLayout(self.note_scroll_grid)
         self.gridLayout_5.setObjectName(u"gridLayout_5")
         self.note_wrapper = QFrame(self.note_scroll_grid)
@@ -354,7 +355,8 @@ class Ui_MainWindow(object):
 "border-top-right-radius: 50px;\n"
 "border-bottom-left-radius: 0px;\n"
 "border-bottom-right-radius: 0px;\n"
-"background: rgb(255, 255, 255);\n")
+"background: rgb(255, 255, 255);\n"
+)
         self.course_container.setFrameShape(QFrame.StyledPanel)
         self.course_container.setFrameShadow(QFrame.Raised)
         self.verticalLayout_5 = QVBoxLayout(self.course_container)
@@ -413,20 +415,86 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setSpacing(20)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
+        
+        # ================================================
+        # ================Create courses==================
+        # ================================================
+        
         self.course = QFrame(self.course_wrapper)
         self.course.setObjectName(u"course")
         self.course.setMinimumSize(QSize(0, 90))
         self.course.setMaximumSize(QSize(16777215, 90))
         self.course.setLayoutDirection(Qt.LeftToRight)
         self.course.setAutoFillBackground(False)
-        self.course.setStyleSheet(u"background: rgba(255, 0, 0);")
+        self.course.setStyleSheet(u"background:transparent;")
         self.course.setFrameShape(QFrame.StyledPanel)
         self.course.setFrameShadow(QFrame.Raised)
-        self.gridLayout_10 = QGridLayout(self.course)
-        self.gridLayout_10.setSpacing(0)
-        self.gridLayout_10.setObjectName(u"gridLayout_10")
-        self.gridLayout_10.setContentsMargins(0, 0, 0, 0)
 
+        folder_img_path = os.path.join(os.path.dirname(__file__), "../resources/icons/folder.svg")
+        with open(folder_img_path, 'r') as image:
+                svg_content = image.read()
+                
+        svg_content = svg_content.replace('fill="#cacaca"', 'fill="#dc2626"')
+
+        self.folder_icon = QLabel(self.course)
+        self.folder_icon.setMinimumSize(70, 70)
+        self.folder_icon.setMaximumSize(70, 70)
+
+        renderer = QSvgRenderer(QByteArray(svg_content.encode())) 
+
+        pixmap = QPixmap(70, 70) 
+        pixmap.fill(Qt.transparent) 
+
+        painter = QPainter(pixmap)
+        renderer.render(painter)
+        painter.end()
+
+        self.folder_icon.setPixmap(pixmap)
+        self.folder_icon.setScaledContents(True)
+        
+        self.course_title = QLabel()
+        self.course_title.setText("Bahasa Inggris")
+        self.course_title.setStyleSheet("font: 20px; color: rgb(75, 75, 75);")
+        
+        self.session_info = QLabel()
+        self.session_info.setText("Selasa, sesi 2")
+        self.session_info.setStyleSheet("font: 14px; color: rgb(75, 75, 75);")
+        
+        self.status_dot = QFrame()
+        self.status_dot.setMinimumSize(16, 16)
+        self.status_dot.setMaximumSize(16, 16)
+        self.status_dot.setStyleSheet("background: rgb(34, 197, 94); border-radius: 8px")
+        
+        self.separator = QFrame()
+        self.separator.setMinimumHeight(5)
+        self.separator.setStyleSheet("""
+        background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, 
+                                        stop:0 rgb(252, 108, 108), stop:1 rgb(239, 20, 20));
+        border: none;
+        """)
+        
+        # Layouting
+        self.course_layout = QVBoxLayout(self.course)
+        
+        self.course_top_layout = QHBoxLayout()
+        self.course_top_layout.setSpacing(10)
+        self.course_top_layout.addWidget(self.folder_icon)
+        
+        self.course_text_layout = QVBoxLayout()
+        self.course_text_layout.addWidget(self.course_title)
+        self.course_text_layout.addWidget(self.session_info)
+        
+        self.course_top_layout.addWidget(self.status_dot, alignment=Qt.AlignTop)
+        self.course_top_layout.addLayout(self.course_text_layout)
+        
+        self.course_layout.addLayout(self.course_top_layout)
+        
+        self.course_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+        self.course_layout.addWidget(self.separator)
+        # ================================================
+        # ================Create courses==================
+        # ================================================
+        
         self.verticalLayout_4.addWidget(self.course)
 
         self.new_course = QFrame(self.course_wrapper)
@@ -492,101 +560,29 @@ class Ui_MainWindow(object):
         self.task_bar.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_3 = QHBoxLayout(self.task_bar)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.Task_frame_5 = QFrame(self.task_bar)
-        self.Task_frame_5.setObjectName(u"Task_frame_5")
-        self.Task_frame_5.setMinimumSize(QSize(55, 55))
-        self.Task_frame_5.setMaximumSize(QSize(55, 55))
-        self.Task_frame_5.setStyleSheet(u"background: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgb(67, 202, 153), stop:1 rgb(122, 250, 200));\n"
+        self.Task_frame_1 = QFrame(self.task_bar)
+        self.Task_frame_1.setObjectName(u"Task_frame_1")
+        self.Task_frame_1.setMinimumSize(QSize(55, 55))
+        self.Task_frame_1.setMaximumSize(QSize(55, 55))
+        self.Task_frame_1.setStyleSheet(u"background: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgb(67, 202, 153), stop:1 rgb(122, 250, 200));\n"
 "\n"
 "border-radius:  25px;")
-        self.Task_frame_5.setFrameShape(QFrame.StyledPanel)
-        self.Task_frame_5.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_11 = QHBoxLayout(self.Task_frame_5)
-        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.Task_6 = QLabel(self.Task_frame_5)
-        self.Task_6.setObjectName(u"Task_6")
-        self.Task_6.setMinimumSize(QSize(40, 40))
-        self.Task_6.setMaximumSize(QSize(40, 40))
-        self.Task_6.setStyleSheet(u"background: rgba(255, 255, 255, 0);")
-        self.Task_6.setPixmap(QPixmap(u"resources/icons/dashboard.svg"))
-        self.Task_6.setScaledContents(True)
-
-        self.horizontalLayout_11.addWidget(self.Task_6)
-
-
-        self.horizontalLayout_3.addWidget(self.Task_frame_5)
-
-        self.Task_frame = QFrame(self.task_bar)
-        self.Task_frame.setObjectName(u"Task_frame")
-        self.Task_frame.setMinimumSize(QSize(55, 55))
-        self.Task_frame.setMaximumSize(QSize(55, 55))
-        self.Task_frame.setStyleSheet(u"background: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgb(67, 202, 153), stop:1 rgb(122, 250, 200));\n"
-"\n"
-"border-radius:  25px;")
-        self.Task_frame.setFrameShape(QFrame.StyledPanel)
-        self.Task_frame.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_6 = QHBoxLayout(self.Task_frame)
+        self.Task_frame_1.setFrameShape(QFrame.StyledPanel)
+        self.Task_frame_1.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_6 = QHBoxLayout(self.Task_frame_1)
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.Task_2 = QLabel(self.Task_frame)
-        self.Task_2.setObjectName(u"Task_2")
-        self.Task_2.setMinimumSize(QSize(40, 40))
-        self.Task_2.setMaximumSize(QSize(40, 40))
-        self.Task_2.setStyleSheet(u"background: rgba(255, 255, 255, 0);")
-        self.Task_2.setPixmap(QPixmap(u"resources/icons/dashboard.svg"))
-        self.Task_2.setScaledContents(True)
+        self.Task_1 = QLabel(self.Task_frame_1)
+        self.Task_1.setObjectName(u"Task_1")
+        self.Task_1.setMinimumSize(QSize(40, 40))
+        self.Task_1.setMaximumSize(QSize(40, 40))
+        self.Task_1.setStyleSheet(u"background: rgba(255, 255, 255, 0);")
+        self.Task_1.setPixmap(QPixmap(u"resources/icons/dashboard.svg"))
+        self.Task_1.setScaledContents(True)
 
-        self.horizontalLayout_6.addWidget(self.Task_2)
-
-
-        self.horizontalLayout_3.addWidget(self.Task_frame)
-
-        self.Task_frame_4 = QFrame(self.task_bar)
-        self.Task_frame_4.setObjectName(u"Task_frame_4")
-        self.Task_frame_4.setMinimumSize(QSize(55, 55))
-        self.Task_frame_4.setMaximumSize(QSize(55, 55))
-        self.Task_frame_4.setStyleSheet(u"background: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgb(67, 202, 153), stop:1 rgb(122, 250, 200));\n"
-"\n"
-"border-radius:  25px;")
-        self.Task_frame_4.setFrameShape(QFrame.StyledPanel)
-        self.Task_frame_4.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_10 = QHBoxLayout(self.Task_frame_4)
-        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
-        self.Task_5 = QLabel(self.Task_frame_4)
-        self.Task_5.setObjectName(u"Task_5")
-        self.Task_5.setMinimumSize(QSize(40, 40))
-        self.Task_5.setMaximumSize(QSize(40, 40))
-        self.Task_5.setStyleSheet(u"background: rgba(255, 255, 255, 0);")
-        self.Task_5.setPixmap(QPixmap(u"resources/icons/dashboard.svg"))
-        self.Task_5.setScaledContents(True)
-
-        self.horizontalLayout_10.addWidget(self.Task_5)
+        self.horizontalLayout_6.addWidget(self.Task_1)
 
 
-        self.horizontalLayout_3.addWidget(self.Task_frame_4)
-
-        self.Task_frame_3 = QFrame(self.task_bar)
-        self.Task_frame_3.setObjectName(u"Task_frame_3")
-        self.Task_frame_3.setMinimumSize(QSize(55, 55))
-        self.Task_frame_3.setMaximumSize(QSize(55, 55))
-        self.Task_frame_3.setStyleSheet(u"background: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgb(67, 202, 153), stop:1 rgb(122, 250, 200));\n"
-"\n"
-"border-radius:  25px;")
-        self.Task_frame_3.setFrameShape(QFrame.StyledPanel)
-        self.Task_frame_3.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_9 = QHBoxLayout(self.Task_frame_3)
-        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
-        self.Task_4 = QLabel(self.Task_frame_3)
-        self.Task_4.setObjectName(u"Task_4")
-        self.Task_4.setMinimumSize(QSize(40, 40))
-        self.Task_4.setMaximumSize(QSize(40, 40))
-        self.Task_4.setStyleSheet(u"background: rgba(255, 255, 255, 0);")
-        self.Task_4.setPixmap(QPixmap(u"resources/icons/dashboard.svg"))
-        self.Task_4.setScaledContents(True)
-
-        self.horizontalLayout_9.addWidget(self.Task_4)
-
-
-        self.horizontalLayout_3.addWidget(self.Task_frame_3)
+        self.horizontalLayout_3.addWidget(self.Task_frame_1)
 
         self.Task_frame_2 = QFrame(self.task_bar)
         self.Task_frame_2.setObjectName(u"Task_frame_2")
@@ -599,15 +595,15 @@ class Ui_MainWindow(object):
         self.Task_frame_2.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_8 = QHBoxLayout(self.Task_frame_2)
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.Task_3 = QLabel(self.Task_frame_2)
-        self.Task_3.setObjectName(u"Task_3")
-        self.Task_3.setMinimumSize(QSize(40, 40))
-        self.Task_3.setMaximumSize(QSize(40, 40))
-        self.Task_3.setStyleSheet(u"background: rgba(255, 255, 255, 0);")
-        self.Task_3.setPixmap(QPixmap(u"resources/icons/dashboard.svg"))
-        self.Task_3.setScaledContents(True)
+        self.Task_2 = QLabel(self.Task_frame_2)
+        self.Task_2.setObjectName(u"Task_2")
+        self.Task_2.setMinimumSize(QSize(40, 40))
+        self.Task_2.setMaximumSize(QSize(40, 40))
+        self.Task_2.setStyleSheet(u"background: rgba(255, 255, 255, 0);")
+        self.Task_2.setPixmap(QPixmap(u"resources/icons/dashboard.svg"))
+        self.Task_2.setScaledContents(True)
 
-        self.horizontalLayout_8.addWidget(self.Task_3)
+        self.horizontalLayout_8.addWidget(self.Task_2)
 
 
         self.horizontalLayout_3.addWidget(self.Task_frame_2)
@@ -636,10 +632,7 @@ class Ui_MainWindow(object):
         self.course_wrapper.setAccessibleName("")
 #endif // QT_CONFIG(accessibility)
         self.new_course_btn.setText(QCoreApplication.translate("MainWindow", u"Tambah kelas", None))
-        self.Task_6.setText("")
+        pixmap = QPixmap("tasks.svg")
+        self.Task_1.setPixmap(QPixmap(pixmap))
         self.Task_2.setText("")
-        self.Task_5.setText("")
-        self.Task_4.setText("")
-        self.Task_3.setText("")
     # retranslateUi
-

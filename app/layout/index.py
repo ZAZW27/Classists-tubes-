@@ -1,18 +1,9 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'design2NgqjnN.ui'
-##
-## Created by: Qt User Interface Compiler version 5.15.2
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
-
 import os
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from PySide6.QtSvg import *
+from .taskbar import TaskBar
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -550,6 +541,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2.addWidget(self.mainScroll, 0, 0, 1, 1)
 
+        # self.task_bar = QFrame(self.centralwidget)
         self.task_bar = QFrame(self.centralwidget)
         self.task_bar.setObjectName(u"task_bar")
         self.task_bar.setMinimumSize(QSize(0, 68))
@@ -609,7 +601,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.addWidget(self.Task_frame_2)
 
 
-        self.gridLayout_2.addWidget(self.task_bar, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(TaskBar, 1, 0, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusBar = QStatusBar(MainWindow)
@@ -620,6 +612,7 @@ class Ui_MainWindow(object):
 
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
+        
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))

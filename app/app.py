@@ -1,4 +1,4 @@
-from pages import main
+# from pages import main
 import sys
 # import pyside6
 from PySide6.QtWidgets import QApplication, QMainWindow, QFrame, QVBoxLayout

@@ -1,4 +1,4 @@
 @echo off
-.env\scripts\activate
+.venv\scripts\activate
 echo Virtual environment is activated
 cmd

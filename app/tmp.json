@@ -1,0 +1,58 @@
+{
+    "1": {
+        "title": "Bahasa Inggris",
+        "color_id": [
+            "rgb(239, 20, 20)",
+            "rgb(252, 108, 108)"
+        ],
+        "sesi": "2",
+        "hari": "selasa",
+        "lokasi": [
+            "G",
+            "101"
+        ],
+        "assignment": {
+            "1": {
+                "title": "Tugas besar 1",
+                "deskripsi": "Membaut paragraf tentang etnisitas yang mengurang di indonesia",
+                "deadline": "1/12/2024",
+                "isFinished": false
+            }
+        },
+        "notes": {
+            "1": {
+                "title": "The differences between verb and adverb",
+                "deskripsi": "Sure! Here's the simple explanation:\n\nVerb: A verb is an action or state. It shows what someone or something is doing or being.\nExample: run, eat, is, play\n\nAdverb: An adverb describes or modifies a verb, an adjective, or another adverb. It often tells how, when, where, or to what extent something happens.\nExample: quickly (how), yesterday (when), outside (where), very (to what extent)\n\nExample in a sentence:\n\nThe boy runs (verb) quickly (adverb).",
+                "created_at": "26/11/2024"
+            }
+        }
+    },
+    "2": {
+        "title": "Kalkulus",
+        "color_id": [
+            "rgb(30, 229, 166)",
+            "rgb(57, 254, 132)"
+        ],
+        "sesi": "1",
+        "hari": "selasa",
+        "lokasi": [
+            "F",
+            "204"
+        ],
+        "assignment": {
+            "1": {
+                "title": "Tugas besar 1",
+                "deskripsi": "Membaut paragraf tentang etnisitas yang mengurang di indonesia",
+                "deadline": "1/12/2024",
+                "isFinished": false
+            }
+        },
+        "notes": {
+            "1": {
+                "title": "The differences between verb and adverb",
+                "deskripsi": "Sure! Here's the simple explanation:\n\nVerb: A verb is an action or state. It shows what someone or something is doing or being.\nExample: run, eat, is, play\n\nAdverb: An adverb describes or modifies a verb, an adjective, or another adverb. It often tells how, when, where, or to what extent something happens.\nExample: quickly (how), yesterday (when), outside (where), very (to what extent)\n\nExample in a sentence:\n\nThe boy runs (verb) quickly (adverb).",
+                "created_at": "26/11/2024"
+            }
+        }
+    }
+}

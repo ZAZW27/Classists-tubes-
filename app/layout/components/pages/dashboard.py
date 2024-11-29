@@ -5,6 +5,8 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from PySide6.QtSvg import *
 
+from controller.dashboard import *
+
 class Dashboard(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -120,7 +122,8 @@ class Dashboard(QFrame):
         self.ass_tit.setStyleSheet(u"color: rgb(88, 89, 89);")
 
         self.horizontalLayout_5.addWidget(self.ass_tit)
-
+        self.ass_tit.setText(QCoreApplication.translate("MainWindow", u"Assigments", None))
+        
         self.line_course_10 = QFrame(self.title_ass)
         self.line_course_10.setObjectName(u"line_course_10")
         self.line_course_10.setMinimumSize(QSize(0, 5))
@@ -160,23 +163,23 @@ class Dashboard(QFrame):
         self.assignments_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.assignments_scroll.setWidgetResizable(True)
         self.assignments_scroll.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
-        self.ass_scroll_grid = QWidget()
-        self.ass_scroll_grid.setObjectName(u"ass_scroll_grid")
-        self.ass_scroll_grid.setGeometry(QRect(0, 0, 628, 60))
-        self.horizontalLayout_4 = QHBoxLayout(self.ass_scroll_grid)
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.Assignments_7 = QWidget(self.ass_scroll_grid)
-        self.Assignments_7.setObjectName(u"Assignments_7")
+        self.ass_scroll_wrapper = QWidget()
+        self.ass_scroll_wrapper.setObjectName(u"ass_scroll_wrapper")
+        self.ass_scroll_wrapper.setGeometry(QRect(0, 0, 628, 60))
+        self.assignments_horizontal_layout = QHBoxLayout(self.ass_scroll_wrapper)
+        self.assignments_horizontal_layout.setObjectName(u"assignments_horizontal_layout")
+        self.Assignments_container = QWidget(self.ass_scroll_wrapper)
+        self.Assignments_container.setObjectName(u"Assignments_container")
         sizePolicy2 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Maximum)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.Assignments_7.sizePolicy().hasHeightForWidth())
-        self.Assignments_7.setSizePolicy(sizePolicy2)
-        self.Assignments_7.setMinimumSize(QSize(150, 0))
-        self.Assignments_7.setStyleSheet(u"background: rgb(30, 229, 166);")
-        self.gridLayout_17 = QGridLayout(self.Assignments_7)
+        sizePolicy2.setHeightForWidth(self.Assignments_container.sizePolicy().hasHeightForWidth())
+        self.Assignments_container.setSizePolicy(sizePolicy2)
+        self.Assignments_container.setMinimumSize(QSize(150, 0))
+        self.Assignments_container.setStyleSheet(u"background: rgb(30, 229, 166);")
+        self.gridLayout_17 = QGridLayout(self.Assignments_container)
         self.gridLayout_17.setObjectName(u"gridLayout_17")
-        self.ass_text = QLabel(self.Assignments_7)
+        self.ass_text = QLabel(self.Assignments_container)
         self.ass_text.setObjectName(u"ass_text")
         sizePolicy3 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
         sizePolicy3.setHorizontalStretch(0)
@@ -188,14 +191,13 @@ class Dashboard(QFrame):
         self.ass_text.setAlignment(Qt.AlignCenter)
 
         self.gridLayout_17.addWidget(self.ass_text, 0, 0, 1, 1)
+        self.ass_text.setText(QCoreApplication.translate("MainWindow", u"UK 9 20 soal", None))
 
+        self.assignments_horizontal_layout.addWidget(self.Assignments_container)
 
-        self.horizontalLayout_4.addWidget(self.Assignments_7)
-
-        self.assignments_scroll.setWidget(self.ass_scroll_grid)
+        self.assignments_scroll.setWidget(self.ass_scroll_wrapper)
 
         self.verticalLayout.addWidget(self.assignments_scroll)
-
 
         self.verticalLayout_3.addWidget(self.assignments)
 
@@ -369,92 +371,20 @@ class Dashboard(QFrame):
 "border-radius: 0;")
         self.course_wrapper.setFrameShape(QFrame.StyledPanel)
         self.course_wrapper.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_4 = QVBoxLayout(self.course_wrapper)
-        self.verticalLayout_4.setSpacing(20)
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.courses_layout = QVBoxLayout(self.course_wrapper)
+        self.courses_layout.setSpacing(20)
+        self.courses_layout.setObjectName(u"courses_layout")
+        self.courses_layout.setContentsMargins(0, 0, 0, 0)
         
-        # ================================================
-        # ================Create courses==================
-        # ================================================
+        # # ================================================
+        # # ================Create courses==================
+        # # ================================================
+        course_data = get_course_data()
         
-        self.course = QFrame(self.course_wrapper)
-        self.course.setObjectName(u"course")
-        self.course.setMinimumSize(QSize(0, 90))
-        self.course.setMaximumSize(QSize(16777215, 90))
-        self.course.setLayoutDirection(Qt.LeftToRight)
-        self.course.setAutoFillBackground(False)
-        self.course.setStyleSheet(u"background:transparent;")
-        self.course.setFrameShape(QFrame.StyledPanel)
-        self.course.setFrameShadow(QFrame.Raised)
-
-        folder_img_path = os.path.join(os.path.dirname(__file__), "../../../resources/icons/folder.svg")
-        with open(folder_img_path, 'r') as image:
-                svg_content = image.read()
+        course_widgets = generate_course(self.course_wrapper, course_data)
+        for course_widget in course_widgets: 
+                self.courses_layout.addWidget(course_widget)
                 
-        svg_content = svg_content.replace('fill="#cacaca"', 'fill="#dc2626"')
-
-        self.folder_icon = QLabel(self.course)
-        self.folder_icon.setMinimumSize(70, 70)
-        self.folder_icon.setMaximumSize(70, 70)
-
-        renderer = QSvgRenderer(QByteArray(svg_content.encode())) 
-
-        pixmap = QPixmap(70, 70) 
-        pixmap.fill(Qt.transparent) 
-
-        painter = QPainter(pixmap)
-        renderer.render(painter)
-        painter.end()
-
-        self.folder_icon.setPixmap(pixmap)
-        self.folder_icon.setScaledContents(True)
-        
-        self.course_title = QLabel()
-        self.course_title.setText("Bahasa Inggris")
-        self.course_title.setStyleSheet("font: 20px; color: rgb(75, 75, 75);")
-        
-        self.session_info = QLabel()
-        self.session_info.setText("Selasa, sesi 2")
-        self.session_info.setStyleSheet("font: 14px; color: rgb(75, 75, 75);")
-        
-        self.status_dot = QFrame()
-        self.status_dot.setMinimumSize(16, 16)
-        self.status_dot.setMaximumSize(16, 16)
-        self.status_dot.setStyleSheet("background: rgb(34, 197, 94); border-radius: 8px")
-        
-        self.separator = QFrame()
-        self.separator.setMinimumHeight(5)
-        self.separator.setStyleSheet("""
-        background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, 
-                                        stop:0 rgb(252, 108, 108), stop:1 rgb(239, 20, 20));
-        border: none;
-        """)
-        
-        # Layouting
-        self.course_layout = QVBoxLayout(self.course)
-        
-        self.course_top_layout = QHBoxLayout()
-        self.course_top_layout.setSpacing(10)
-        self.course_top_layout.addWidget(self.folder_icon)
-        
-        self.course_text_layout = QVBoxLayout()
-        self.course_text_layout.addWidget(self.course_title)
-        self.course_text_layout.addWidget(self.session_info)
-        
-        self.course_top_layout.addWidget(self.status_dot, alignment=Qt.AlignTop)
-        self.course_top_layout.addLayout(self.course_text_layout)
-        
-        self.course_layout.addLayout(self.course_top_layout)
-        
-        self.course_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
-        self.course_layout.addWidget(self.separator)
-        # ================================================
-        # ================Create courses==================
-        # ================================================
-        
-        self.verticalLayout_4.addWidget(self.course)
-
         self.new_course = QFrame(self.course_wrapper)
         self.new_course.setObjectName(u"new_course")
         self.new_course.setMinimumSize(QSize(0, 50))
@@ -496,7 +426,7 @@ class Dashboard(QFrame):
         self.horizontalLayout_2.addWidget(self.new_course_btn)
 
 
-        self.verticalLayout_4.addWidget(self.new_course)
+        self.courses_layout.addWidget(self.new_course)
 
 
         self.verticalLayout_5.addWidget(self.course_wrapper)
@@ -504,8 +434,6 @@ class Dashboard(QFrame):
 
         self.gridLayout.addWidget(self.course_container, 1, 0, 1, 1)
         
-        self.ass_tit.setText(QCoreApplication.translate("MainWindow", u"Assigments", None))
-        self.ass_text.setText(QCoreApplication.translate("MainWindow", u"UK 9 20 soal :( askolndikoajnsdijasd", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Jangan lupa hari ini ada kuis kalkulus yaawh", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Jangan lupa laprak kimia dikumpul", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Classes", None))

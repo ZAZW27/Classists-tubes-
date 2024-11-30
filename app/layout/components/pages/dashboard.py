@@ -377,14 +377,14 @@ class Dashboard(QFrame):
         self.courses_layout.setContentsMargins(0, 0, 0, 0)
         
         # # ================================================
-        # # ================Create courses==================
+        # # ============Create couser STARTses==============
         # # ================================================
         course_data = get_course_data()
         
         course_widgets = generate_course(self.course_wrapper, course_data)
         for course_widget in course_widgets: 
                 self.courses_layout.addWidget(course_widget)
-                
+
         self.new_course = QFrame(self.course_wrapper)
         self.new_course.setObjectName(u"new_course")
         self.new_course.setMinimumSize(QSize(0, 50))
@@ -407,6 +407,13 @@ class Dashboard(QFrame):
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.new_course_btn = QPushButton(self.new_course)
         self.new_course_btn.setObjectName(u"new_course_btn")
+        
+        self.new_course_btn.clicked.connect(lambda: create_new_course_form(self))
+        
+        # # ================================================
+        # # =============Create courses END ================
+        # # ================================================
+        
         sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy4.setHorizontalStretch(0)
         sizePolicy4.setVerticalStretch(0)

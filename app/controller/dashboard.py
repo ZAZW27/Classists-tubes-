@@ -204,3 +204,172 @@ def generate_course(course_wrapper, courses):
         course_widgets.append(course)
 
     return course_widgets
+    
+def create_new_course_form(main_window):
+    # Create the dialog
+    modal = QDialog(main_window)
+    modal.setStyleSheet("color: rgb(0, 0, 0);")
+    modal.setWindowTitle("Choose a Course Details")
+    modal.setGeometry(200, 200, 400, 400)
+
+    # Main Layout
+    main_layout = QVBoxLayout()
+
+    # Instructions
+    instructions = QLabel("Fill in the course details:")
+    instructions.setAlignment(Qt.AlignCenter)
+    main_layout.addWidget(instructions)
+
+    # Create Form Layout
+    form_layout = QFormLayout()
+
+    # Course Name Input
+    course_name_input = QLineEdit()
+    form_layout.addRow("Course Name:", course_name_input)
+
+    # Hari (Day) Dropdown
+    hari_select = QComboBox()
+    hari_select.addItems(["Senin", "Selasa", "Rabu", "Kamis", "Jumat"])
+    form_layout.addRow("Hari:", hari_select)
+
+    # Sesi (Session) Dropdown
+    sesi_select = QComboBox()
+    sesi_select.addItems(["1", "2", "3", "4"])
+    form_layout.addRow("Sesi:", sesi_select)
+
+    # Gedung (Building) Dropdown
+    gedung_select = QComboBox()
+    gedung_select.addItems(["A", "B", "E", "F", "G"])
+    form_layout.addRow("Gedung:", gedung_select)
+
+    # Lantai (Floor) Dropdown
+    lantai_select = QComboBox()
+    lantai_select.addItems(["1", "2", "3"])
+    form_layout.addRow("Lantai:", lantai_select)
+
+    # Ruangan (Room) Dropdown
+    ruangan_select = QComboBox()
+    ruangan_select.addItems([str(i) for i in range(1, 11)])  # Rooms 1 to 10
+    form_layout.addRow("Ruangan:", ruangan_select)
+
+    # Create Radio Button Group for Colors
+    radio_group = QButtonGroup()
+
+    # Load colors from the file
+    with open("app/data/colors.json", "r") as color_File: 
+        colors = json.load(color_File)
+
+    # Grid Layout for Color Radio Buttons
+    color_grid_layout = QGridLayout()
+    row, col = 0, 0
+
+    # Add a radio button and color box for each color in the JSON file
+    for key, values in colors.items():
+        color_name = values[0]
+        primary_color = values[1]  # Primary color (e.g., "rgb(239, 20, 20)")
+
+        # Create radio button
+        radio_button = QRadioButton(f"{color_name}")  # Add name for clarity
+        radio_group.addButton(radio_button, int(key))  # Use key as the ID
+
+        # Style radio button (to show black border and selection effect)
+        radio_button.setStyleSheet(f"""
+            QRadioButton {{
+                padding: 5px;
+                border: 2px solid black;
+                border-radius: 5px;
+                background-color: {primary_color};
+            }}
+            QRadioButton::indicator {{
+                width: 16px;
+                height: 16px;
+                border: 2px solid black;
+                border-radius: 8px;
+                background-color: white;
+            }}
+            QRadioButton::indicator:checked {{
+                background-color: #4CAF50;  /* Green for selected state */
+                border: 2px solid black;
+            }}
+            QRadioButton::indicator:checked:hover {{
+                background-color: #45a049;  /* Darker green on hover */
+            }}
+        """)
+
+        # Add the radio button to the grid layout
+        color_grid_layout.addWidget(radio_button, row, col)
+        
+        # Adjust row and column for grid layout
+        col += 1
+        if col > 3:  # Change number of columns here if needed
+            col = 0
+            row += 1
+
+    # Add the color grid layout to the form layout
+    form_layout.addRow("Select Color:", color_grid_layout)
+
+    # Buttons
+    submit_button = QPushButton("Submit")
+    cancel_button = QPushButton("Cancel")
+
+    # Close modal on cancel
+    cancel_button.clicked.connect(modal.reject)
+
+    # Submission logic
+    def submit_form():
+        # Get values from the inputs
+        course_name = course_name_input.text()
+        hari = hari_select.currentText()
+        sesi = sesi_select.currentText()
+        gedung = gedung_select.currentText()
+        lantai = lantai_select.currentText()
+        ruangan = ruangan_select.currentText()
+
+        # Get the selected color
+        selected_color_id = radio_group.checkedId()
+        selected_color = colors.get(str(selected_color_id), ["", ""])[0]  # Default to empty if no color is selected
+
+        course_identificatio =[course_name, hari, sesi, gedung, f"{lantai}0{ruangan}", selected_color]        
+        create_course(course_identificatio)
+        modal.accept()  # Close modal after submission
+
+    submit_button.clicked.connect(submit_form)
+
+    # Buttons Layout
+    buttons_layout = QHBoxLayout()
+    buttons_layout.addStretch()
+    buttons_layout.addWidget(cancel_button)
+    buttons_layout.addWidget(submit_button)
+
+    # Main layout
+    main_layout.addLayout(form_layout)
+    main_layout.addLayout(buttons_layout)
+
+    modal.setLayout(main_layout)
+
+    # Execute the dialog and wait for user interaction
+    modal.exec_()
+
+def create_course(course_id):
+    course_path = "app/data/courses"
+    
+    for item in os.listdir(course_path): continue
+    new_course_folder = os.path.join(course_path, str(int(item) + 1))
+    
+    os.mkdir(new_course_folder)
+    
+    for file_name in ["id.json", "assignment.json", "note.json"]: 
+        with open(os.path.join(new_course_folder, file_name), "w") as file:
+            json.dump({}, file, indent=4)
+
+    write_data = {
+        "title": course_id[0], 
+        "color_id": course_id[5], 
+        "sesi": course_id[2], 
+        "hari": course_id[1], 
+        "lokasi": [course_id[3], course_id[4]]
+    }
+    
+    # with open(os.path.join(new_course_folder, "id.json"), "w") as file: 
+    #     json.dump(file, write_data, indent=4)
+    print(write_data)

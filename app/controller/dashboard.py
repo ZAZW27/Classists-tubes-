@@ -271,7 +271,7 @@ def create_new_course_form(main_window):
         # Create radio button
         radio_button = QRadioButton(f"{color_name}")  # Add name for clarity
         radio_group.addButton(radio_button, int(key))  # Use key as the ID
-
+        
         # Style radio button (to show black border and selection effect)
         radio_button.setStyleSheet(f"""
             QRadioButton {{
@@ -319,7 +319,7 @@ def create_new_course_form(main_window):
     def submit_form():
         # Get values from the inputs
         course_name = course_name_input.text()
-        hari = hari_select.currentText()
+        hari = (hari_select.currentText()).lower()
         sesi = sesi_select.currentText()
         gedung = gedung_select.currentText()
         lantai = lantai_select.currentText()
@@ -327,10 +327,16 @@ def create_new_course_form(main_window):
 
         # Get the selected color
         selected_color_id = radio_group.checkedId()
-        selected_color = colors.get(str(selected_color_id), ["", ""])[0]  # Default to empty if no color is selected
+        selected_color = colors.get(str(selected_color_id), ["", ""]) 
+        
+        for key, value in colors.items():
+            if value == selected_color:
+                selected_color = key
+                break
 
         course_identificatio =[course_name, hari, sesi, gedung, f"{lantai}0{ruangan}", selected_color]        
         create_course(course_identificatio)
+                
         modal.accept()  # Close modal after submission
 
     submit_button.clicked.connect(submit_form)
@@ -358,7 +364,7 @@ def create_course(course_id):
     
     os.mkdir(new_course_folder)
     
-    for file_name in ["id.json", "assignment.json", "note.json"]: 
+    for file_name in ["assignment.json", "note.json"]: 
         with open(os.path.join(new_course_folder, file_name), "w") as file:
             json.dump({}, file, indent=4)
 
@@ -370,6 +376,7 @@ def create_course(course_id):
         "lokasi": [course_id[3], course_id[4]]
     }
     
-    # with open(os.path.join(new_course_folder, "id.json"), "w") as file: 
-    #     json.dump(file, write_data, indent=4)
+    with open(new_course_folder + "/id.json", "w") as file: 
+        json.dump(write_data, file, indent=4)
+
     print(write_data)

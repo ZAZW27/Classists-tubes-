@@ -50,6 +50,7 @@ def get_course_data():
         with open(notes_path, 'r') as file: courses[item]["notes"] = json.load(file)
 
     sorted_courses = dict(sorted(courses.items(), key=lambda x: get_time_distance(x[1])))
+    with open("app/tmp.json", 'w') as file: json.dump(sorted_courses, file, indent=4)
     
     return sorted_courses
 
@@ -161,9 +162,12 @@ def generate_course(course_wrapper, courses):
         color = courses[course_data].get("status_dot", "rgb(255, 0, 0)")
         status_dot.setStyleSheet(f"background: {color}; border-radius: 8px")
         
-        complete = QLabel()
-        complete.setText("apa aja ini")
-        complete.setStyleSheet("color: rgb(0,0,0);")
+        class_location = QLabel()
+        lokasi = courses[course_data].get("lokasi", ["No Location", "Info"])
+        class_location.setText(f"Ruangan: {lokasi[0]}{lokasi[1]}")
+        class_location.setStyleSheet("color: rgb(0,0,0); font: 15px")
+        
+        print("belum le" if courses[course_data]["assignment"].get('isFinished') == False else "udah")
         
         incomplete = QLabel()
         incomplete.setText("apa aja ini")
@@ -182,12 +186,20 @@ def generate_course(course_wrapper, courses):
         course_layout = QVBoxLayout(course)
         
         course_text_wrapper = QFrame()
-        course_text_wrapper.setStyleSheet("background: rgb(0, 255, 0);")
-        course_text_wrapper.setMaximumSize(200, 200)
-        course_text_wrapper.setMinimumSize(0, 50)
         
         course_top_vertical = QVBoxLayout()
-        assignment_layout = QHBoxLayout()
+        
+        course_side_info = QFrame()
+        course_side_info.setObjectName("courseSideInfo")
+        course_side_info.setStyleSheet("""
+    #courseSideInfo {
+        border-left: 2px solid rgb(220, 220, 220);
+    }
+""")
+        # course_side_info.setMaximumSize(40, 100)
+        
+        assignment_layout = QVBoxLayout()
+        course_side_info.setLayout(assignment_layout)
         
         course_top_layout = QHBoxLayout()
         course_top_layout.setSpacing(10)
@@ -202,9 +214,10 @@ def generate_course(course_wrapper, courses):
         
         course_text_wrapper.setLayout(course_text_layout)
         course_top_vertical.addWidget(course_text_wrapper)
-        course_top_vertical.addLayout(assignment_layout)
         
-        assignment_layout.addWidget(complete)
+        course_top_layout.addWidget(course_side_info)
+        
+        assignment_layout.addWidget(class_location)
         assignment_layout.addWidget(incomplete)
         
         course_layout.addLayout(course_top_layout)

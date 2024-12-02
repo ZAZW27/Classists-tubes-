@@ -50,15 +50,11 @@ def get_course_data():
         with open(notes_path, 'r') as file: courses[item]["notes"] = json.load(file)
 
     sorted_courses = dict(sorted(courses.items(), key=lambda x: get_time_distance(x[1])))
-    with open("app/tmp.json", 'w') as file: json.dump(sorted_courses, file, indent=4)
+    with open("app/temp/tmp.json", 'w') as file: json.dump(sorted_courses, file, indent=4)
     
     return sorted_courses
 
 def get_time_distance(item):
-    import locale
-    from datetime import datetime, timedelta
-    import json
-
     locale.setlocale(locale.LC_TIME, "id_ID.UTF-8")
     order_of_days = ["senin", "selasa", "rabu", "kamis", "jumat", "sabtu", "minggu"]
 
@@ -95,9 +91,9 @@ def get_time_distance(item):
     if days_ahead > 0:  # Not today
         item["status_dot"] = "rgb(211, 211, 211)"  # Light grey
     elif days_ahead == 0:  # Today
-        if time_until_start > 3600:  # Far (more than 1 hour away)
+        if time_until_start > 7200:  # Far (more than 1 hour away)
             item["status_dot"] = "rgb(255, 0, 0)"  # Red
-        elif 0 < time_until_start <= 3600:  # Near (within 1 hour)
+        elif 0 < time_until_start <= 7200:  # Near (within 1 hour)
             item["status_dot"] = "rgb(255, 217, 0)"  # Yellow
         elif time_until_end >= 0:  # Ongoing class
             item["status_dot"] = "rgb(34, 197, 94)"  # Green
@@ -167,11 +163,14 @@ def generate_course(course_wrapper, courses):
         class_location.setText(f"Ruangan: {lokasi[0]}{lokasi[1]}")
         class_location.setStyleSheet("color: rgb(0,0,0); font: 15px")
         
-        print("belum le" if courses[course_data]["assignment"].get('isFinished') == False else "udah")
+        # print("belum le" if courses[course_data]["assignment"].get('isFinished') == False else "udah")
+        notComplete = 0
+        for i in courses[course_data]["assignment"]: 
+            if courses[course_data]["assignment"][i].get('isFinished') == False: notComplete += 1
         
         incomplete = QLabel()
-        incomplete.setText("apa aja ini")
-        incomplete.setStyleSheet("color: rgb(0,0,0);")
+        incomplete.setText(f"Incomplete task: {notComplete}")
+        incomplete.setStyleSheet("color: rgb(0,0,0); font: 12px")
         
         separator = QFrame()
         separator.setMinimumHeight(5)

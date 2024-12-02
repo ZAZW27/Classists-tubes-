@@ -461,3 +461,29 @@ class Dashboard(QFrame):
                 for course_widget in course_widgets:
                         self.courses_layout.addWidget(course_widget)
                 
+                self.new_course = QFrame(self.course_wrapper)
+                self.new_course.setObjectName(u"new_course")
+                self.new_course.setMinimumSize(QSize(0, 50))
+                self.new_course.setMaximumSize(QSize(16777215, 90))
+                self.new_course.setLayoutDirection(Qt.LeftToRight)
+                self.new_course.setAutoFillBackground(False)
+                self.new_course.setStyleSheet(u"QFrame{\n"
+        "border: 4px solid rgb(156, 163, 175);\n"
+        "border-radius: 20px;\n"
+        "}\n"
+        "\n"
+        "QFrame:hover{\n"
+        " border: 4px solid rgb(65, 225, 182);\n"
+        "}")
+                self.new_course.setFrameShape(QFrame.StyledPanel)
+                self.new_course.setFrameShadow(QFrame.Raised)
+                self.horizontalLayout_2 = QHBoxLayout(self.new_course)
+                self.horizontalLayout_2.setSpacing(0)
+                self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+                self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+                self.new_course_btn = QPushButton(self.new_course)
+                self.new_course_btn.setObjectName(u"new_course_btn")
+                
+                
+                self.new_course_btn.clicked.connect(self.create_new_course)
+                

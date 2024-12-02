@@ -149,6 +149,7 @@ def generate_course(course_wrapper, courses):
         course_title = QLabel()
         course_title.setText(courses[course_data].get("title", "Unknown Course"))
         course_title.setStyleSheet("font: 20px; color: rgb(75, 75, 75);")
+        course_title.setMinimumHeight(20)
 
         session_label = QLabel()
         session_label.setText(courses[course_data].get("sesi", "No Session Info"))
@@ -159,11 +160,14 @@ def generate_course(course_wrapper, courses):
         status_dot.setMaximumSize(16, 16)
         color = courses[course_data].get("status_dot", "rgb(255, 0, 0)")
         status_dot.setStyleSheet(f"background: {color}; border-radius: 8px")
+        
         complete = QLabel()
         complete.setText("apa aja ini")
+        complete.setStyleSheet("color: rgb(0,0,0);")
         
         incomplete = QLabel()
         incomplete.setText("apa aja ini")
+        incomplete.setStyleSheet("color: rgb(0,0,0);")
         
         separator = QFrame()
         separator.setMinimumHeight(5)
@@ -176,7 +180,12 @@ def generate_course(course_wrapper, courses):
 
         # Layouting
         course_layout = QVBoxLayout(course)
-
+        
+        course_text_wrapper = QFrame()
+        course_text_wrapper.setStyleSheet("background: rgb(0, 255, 0);")
+        course_text_wrapper.setMaximumSize(200, 200)
+        course_text_wrapper.setMinimumSize(0, 50)
+        
         course_top_vertical = QVBoxLayout()
         assignment_layout = QHBoxLayout()
         
@@ -191,7 +200,8 @@ def generate_course(course_wrapper, courses):
         course_top_layout.addWidget(status_dot, alignment=Qt.AlignTop)
         course_top_layout.addLayout(course_top_vertical)
         
-        course_top_vertical.addLayout(course_text_layout)
+        course_text_wrapper.setLayout(course_text_layout)
+        course_top_vertical.addWidget(course_text_wrapper)
         course_top_vertical.addLayout(assignment_layout)
         
         assignment_layout.addWidget(complete)

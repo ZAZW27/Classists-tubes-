@@ -78,7 +78,7 @@ class Note(QFrame):
         self.saveEdit.setMinimumSize(QSize(20, 20))
         self.saveEdit.setMaximumSize(QSize(40, 40))
         self.saveEdit.setStyleSheet(u"color: rgb(0,255,0);\n"
-"font: 40px; border: 2px solid rgba(0,200,120); border-radius: 17px;")
+"font: 40px; border: 2px solid rgb(0,200,120); border-radius: 17px;")
 
         self.horizontalLayout_2.addWidget(self.saveEdit)
 

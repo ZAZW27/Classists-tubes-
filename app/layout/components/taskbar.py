@@ -73,6 +73,5 @@ class TaskBar(QFrame):
         task_frame.mousePressEvent = lambda event: self.on_task_click(task_id)
 
     def on_task_click(self, task_id):
-        """Handler when a task is clicked"""
         if self.task_click_callback:
             self.task_click_callback(task_id)

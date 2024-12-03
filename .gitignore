@@ -1,4 +1,4 @@
 /tests/
 coba.bat
 app/temp
-__pycache__
+**/__pycache__

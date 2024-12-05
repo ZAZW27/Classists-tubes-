@@ -8,8 +8,10 @@ from PySide6.QtSvg import *
 from controller.dashboard import *
 
 class Dashboard(QFrame):
-        def __init__(self, parent=None):
+        def __init__(self, parent=None, course_click_callback=None):
                 super().__init__(parent)
+                
+                self.course_click_callback = course_click_callback
                 
                 self.setObjectName(u"wrapper")
                 self.setGeometry(QRect(0, 0, 679, 1037))
@@ -380,8 +382,9 @@ class Dashboard(QFrame):
                 # # ============Create couser STARTses==============
                 # # ================================================
                 course_data = get_course_data()
+                # print(course_data)
                 
-                course_widgets = generate_course(self.course_wrapper, course_data)
+                course_widgets = generate_course(self.course_wrapper, course_data, click_course_btn=lambda course_id: self.on_course_click(course_id))
                 for course_widget in course_widgets: 
                         self.courses_layout.addWidget(course_widget)
 
@@ -486,4 +489,8 @@ class Dashboard(QFrame):
                 
                 
                 self.new_course_btn.clicked.connect(self.create_new_course)
-                
+        
+        def on_course_click(self, course_id=None): 
+                if self.course_click_callback: 
+                        self.course_click_callback(course_id)
+        

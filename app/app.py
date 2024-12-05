@@ -1,12 +1,17 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import *
 from PySide6.QtCore import QSize
 from layout.index import Ui_MainWindow
 from layout.components.taskbar import TaskBar  
 from layout.components.pages.dashboard import Dashboard
 from layout.components.pages.note import Note
+from layout.components.pages.course import Course
+import json
 
 
+# ==============================================================================
+# ------------------------------INITIALIZE PROGRAM------------------------------
+# ==============================================================================
 page = 1
 def setup_ui():
     main_window = QMainWindow()
@@ -22,24 +27,117 @@ def setup_ui():
     main_window.show()
     return main_window, ui  # Return both the main_window and ui
 
+# ==============================================================================
+# ------------------------------GETTING COMPONENT-------------------------------
+# ==============================================================================
+
+# ------------------- GET TASKBAR COMPONENT
 def setup_taskbar(main_window, ui): 
     task_bar = TaskBar(main_window, task_click_callback=lambda task_id: handle_page_toggle(task_id, ui, main_window))
 
     ui.gridLayout_2.addWidget(task_bar, 1, 0, 1, 1)
 
+# ------------------- GET DASHBOARD COMPONENT
 def setup_dashboard(main_window, ui):
-    wrapper = Dashboard(main_window)
+    wrapper = Dashboard(main_window, course_click_callback=lambda course_id: get_course_data(course_id, ui, main_window))
     ui.mainScroll.setWidget(wrapper)
     ui.gridLayout_2.addWidget(ui.mainScroll, 0, 0, 1, 1)
 
-def setup_note_edit(main_window, ui): 
-    wrapper = Note(main_window)
+# ------------------- GET COURSE COMPONENT
+def setup_course(main_window, ui, course_id): 
+    course_wrapper = Course(main_window, course_id)
+    ui.mainScroll.setWidget(course_wrapper)
+    
+    with open(f"app/data/courses/{course_id}/assignment.json", 'r') as file:
+        assignment = json.load(file)
+    with open(f"app/data/courses/{course_id}/id.json", 'r') as file:
+        courses = json.load(file)
+    with open(f"app/data/courses/{course_id}/note.json", 'r') as file:
+        note = json.load(file)
+    
+    # setWindowTitle(f"{courses['title']} - Dashboard")
+
+    # Set the course identity
+    lokasi = courses["lokasi"] # merge the building and classroom number
+    course_wrapper.course_title_lbl.setText(f"<p align='center'><span style=' font-size:16pt; font-weight:700;'><b>{courses['title']}</b></span></p>")
+    course_wrapper.classroom_lbl.setText(f"<b>Ruang Kelas:</b> {''.join(lokasi)}")
+    course_wrapper.session_lbl.setText(f"<b>Sesi:</b> {courses['sesi']}")
+
+    # Header buttons connections
+    # course_wrapper.return_btn.clicked.connect(return_to_dashboard)
+    # course_wrapper.edit_btn.clicked.connect(edit_course)
+    # course_wrapper.del_btn.clicked.connect(delete_course)
+
+    # # Add to-do and note buttons connections
+    # course_wrapper.add_todo_btn.clicked.connect(add_todo)
+    # course_wrapper.add_note_btn.clicked.connect(add_note)
+
+    # Construct the to-do and note items
+    add_task_frames(assignment, course_wrapper)
+    add_note_frames(note, course_wrapper)
+
+def add_task_frames(assignment, course_wrapper):
+    """Create frames for each task in the JSON data."""
+    for key, task in assignment.items():
+        title = task.get("title")
+        description = task.get("deskripsi")
+        deadline = task.get("deadline")
+        is_finished = task.get("isFinished")
+
+        # Create a frame for the task
+        frame = QFrame()
+        frame.setFrameShape(QFrame.StyledPanel)
+        frame.setStyleSheet("background-color: lightyellow; padding: 10px; margin: 5px;")
+        layout = QVBoxLayout(frame)
+
+        # Add task details as labels
+        layout.addWidget(QLabel(f"<b>Tugas {key}:</b> {title}"))
+        layout.addWidget(QLabel(f"<b>Deskripsi:</b> {description}"))
+        layout.addWidget(QLabel(f"<b>Tenggat pengumpulan:</b> {deadline}"))
+        layout.addWidget(QLabel(f"<b>Ditandai selesai:</b> {'Ya' if is_finished else 'Tidak'}"))
+
+        # Add the frame to the main layout
+        course_wrapper.todo_list_lyt.addWidget(frame)
+
+
+def add_note_frames(notes, course_wrapper):
+    """Create frames for each note in the JSON data."""
+    for key, note in notes.items():
+        title = note.get("title")
+        description = note.get("deskripsi")
+        created_at = note.get("created_at")
+
+        # Create a frame for the note
+        frame = QFrame()
+        frame.setFrameShape(QFrame.StyledPanel)
+        frame.setStyleSheet("background-color: lightyellow; padding: 10px; margin: 5px;")
+        layout = QVBoxLayout(frame)
+
+        # Add note details as labels
+        description_lbl = QLabel(f"<b>Isi:</b> {description}")
+        description_lbl.setWordWrap(True)
+        layout.addWidget(QLabel(f"<b>Catatan {key}:</b> {title}"))
+        layout.addWidget(description_lbl)
+        layout.addWidget(QLabel(f"<b>Dibuat pada:</b> {created_at}"))
+
+        # Add the frame to the main layout
+        course_wrapper.note_list_lyt.addWidget(frame)
+
+
+# ------------------- GET NOTES COMPONENT
+def setup_note_edit(main_window, ui, course_id, note_id): 
+    with open(f"app/data/courses/{course_id}/id.json", 'r') as file:
+        title = json.load(file)["title"]
+        
+    wrapper = Note(main_window, note_id, title, course_id, )
     ui.mainScroll.setWidget(wrapper)
     ui.gridLayout_2.addWidget(ui.mainScroll, 0, 0, 1, 1)
 
-def setup_other_page(main_window, ui):
-    pass
-
+# ==============================================================================
+# ------------------------------HANDLE PAGE CANGE-------------------------------
+# ==============================================================================
+ 
+# ------------------- TASKBAR BUTTONS
 def handle_page_toggle(task_id, ui, main_window):
     global page 
     print(f"Task clicked: {task_id}")
@@ -52,9 +150,18 @@ def handle_page_toggle(task_id, ui, main_window):
     if page == 1:
         setup_dashboard(main_window, ui)
     else:
-        print("clicked")
-        setup_note_edit(main_window, ui)
-        
+        setup_note_edit(main_window, ui, "1", "1")
+
+def get_course_data(course_id, ui, main_window): 
+    current_widget = ui.mainScroll.widget()
+    if current_widget:
+        current_widget.deleteLater()
+    
+    setup_course(main_window, ui, course_id)
+    
+# ==============================================================================
+# ------------------------------STARTING PROGRAM--------------------------------
+# ==============================================================================
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     main_window, ui = setup_ui()

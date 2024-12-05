@@ -104,129 +104,139 @@ def get_time_distance(item):
 
     return time_until_start  # Return time difference until start (if needed)
 
-def generate_course(course_wrapper, courses): 
+def course_clicked_signal(course_id, click_course_btn): 
+    print(course_id)
+    if click_course_btn: 
+        click_course_btn(course_id)
+
+def generate_course(course_wrapper, courses, click_course_btn=None): 
     # print(f"Creating course for: {course_data['title']}")
     # ================================================
     # ================Create courses==================
     # ================================================
-    
     course_widgets = []
+    # list_course = list(course)
     for course_data in courses:
-        course = QFrame(course_wrapper)
-        course.setObjectName(u"course")
-        course.setMinimumSize(QSize(0, 90))
-        course.setMaximumSize(QSize(16777215, 90))
-        course.setStyleSheet("background:transparent;")
-        course.setFrameShape(QFrame.StyledPanel)
-        course.setFrameShadow(QFrame.Raised)
-
-        # Load and customize the folder icon
-        folder_img_path = os.path.join(os.path.dirname(__file__), "../resources/icons/folder.svg")
-        with open(folder_img_path, 'r') as image:
-            svg_content = image.read()
-        svg_content = svg_content.replace('fill="#cacaca"', f'fill="{courses[course_data].get("color_id", "#cacaca")[0]}"')
-
-        folder_icon = QLabel(course)
-        folder_icon.setMinimumSize(70, 70)
-        folder_icon.setMaximumSize(70, 70)
-
-        renderer = QSvgRenderer(QByteArray(svg_content.encode()))
-
-        pixmap = QPixmap(70, 70)
-        pixmap.fill(Qt.transparent)
-
-        painter = QPainter(pixmap)
-        renderer.render(painter)
-        painter.end()
-
-        folder_icon.setPixmap(pixmap)
-        folder_icon.setScaledContents(True)
-
-        # Add course details
-        course_title = QLabel()
-        course_title.setText(courses[course_data].get("title", "Unknown Course"))
-        course_title.setStyleSheet("font: 20px; color: rgb(75, 75, 75);")
-        course_title.setMinimumHeight(20)
-
-        session_label = QLabel()
-        session_label.setText(courses[course_data].get("sesi", "No Session Info"))
-        session_label.setStyleSheet("font: 14px; color: rgb(75, 75, 75);")
-
-        status_dot = QFrame()
-        status_dot.setMinimumSize(16, 16)
-        status_dot.setMaximumSize(16, 16)
-        color = courses[course_data].get("status_dot", "rgb(255, 0, 0)")
-        status_dot.setStyleSheet(f"background: {color}; border-radius: 8px")
-        
-        class_location = QLabel()
-        lokasi = courses[course_data].get("lokasi", ["No Location", "Info"])
-        class_location.setText(f"Ruangan: {lokasi[0]}{lokasi[1]}")
-        class_location.setStyleSheet("color: rgb(0,0,0); font: 15px")
-        
-        # print("belum le" if courses[course_data]["assignment"].get('isFinished') == False else "udah")
-        notComplete = 0
-        for i in courses[course_data]["assignment"]: 
-            if courses[course_data]["assignment"][i].get('isFinished') == False: notComplete += 1
-        
-        incomplete = QLabel()
-        incomplete.setText(f"Incomplete task: {notComplete}")
-        incomplete.setStyleSheet("color: rgb(0,0,0); font: 12px")
-        
-        separator = QFrame()
-        separator.setMinimumHeight(5)
-        separator.setStyleSheet(f"""
-            background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, 
-                    stop:0 {courses[course_data].get("color_id", "#cacaca")[0]}, 
-                    stop:1 {courses[course_data].get("color_id", "#cacaca")[1]});
-            border: none;
-        """)
-
-        # Layouting
-        course_layout = QVBoxLayout(course)
-        
-        course_text_wrapper = QFrame()
-        
-        course_top_vertical = QVBoxLayout()
-        
-        course_side_info = QFrame()
-        course_side_info.setObjectName("courseSideInfo")
-        course_side_info.setStyleSheet("""
-    #courseSideInfo {
-        border-left: 2px solid rgb(220, 220, 220);
-    }
-""")
-        # course_side_info.setMaximumSize(40, 100)
-        
-        assignment_layout = QVBoxLayout()
-        course_side_info.setLayout(assignment_layout)
-        
-        course_top_layout = QHBoxLayout()
-        course_top_layout.setSpacing(10)
-        course_top_layout.addWidget(folder_icon)
-        
-        course_text_layout = QVBoxLayout()
-        course_text_layout.addWidget(course_title)
-        course_text_layout.addWidget(session_label)
-
-        course_top_layout.addWidget(status_dot, alignment=Qt.AlignTop)
-        course_top_layout.addLayout(course_top_vertical)
-        
-        course_text_wrapper.setLayout(course_text_layout)
-        course_top_vertical.addWidget(course_text_wrapper)
-        
-        course_top_layout.addWidget(course_side_info)
-        
-        assignment_layout.addWidget(class_location)
-        assignment_layout.addWidget(incomplete)
-        
-        course_layout.addLayout(course_top_layout)
-        course_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
-        course_layout.addWidget(separator)
-
-        course_widgets.append(course)
+        generate_each_course(course_widgets, course_wrapper, course_data, courses, click_course_btn)
 
     return course_widgets
+
+def generate_each_course(course_widgets, course_wrapper, course_data, courses, click_course_btn): 
+    course = QFrame(course_wrapper)
+    course.setObjectName(u"course")
+    course.setMinimumSize(QSize(0, 90))
+    course.setMaximumSize(QSize(16777215, 90))
+    course.setStyleSheet("background:transparent;")
+    course.setFrameShape(QFrame.StyledPanel)
+    course.setFrameShadow(QFrame.Raised)
+
+    # Load and customize the folder icon
+    folder_img_path = os.path.join(os.path.dirname(__file__), "../resources/icons/folder.svg")
+    with open(folder_img_path, 'r') as image:
+        svg_content = image.read()
+    svg_content = svg_content.replace('fill="#cacaca"', f'fill="{courses[course_data].get("color_id", "#cacaca")[0]}"')
+
+    folder_icon = QLabel(course)
+    folder_icon.setMinimumSize(70, 70)
+    folder_icon.setMaximumSize(70, 70)
+
+    renderer = QSvgRenderer(QByteArray(svg_content.encode()))
+
+    pixmap = QPixmap(70, 70)
+    pixmap.fill(Qt.transparent)
+
+    painter = QPainter(pixmap)
+    renderer.render(painter)
+    painter.end()
+
+    folder_icon.setPixmap(pixmap)
+    folder_icon.setScaledContents(True)
+
+    # Add course details
+    course_title = QLabel()
+    course_title.setText(courses[course_data].get("title", "Unknown Course"))
+    course_title.setStyleSheet("font: 20px; color: rgb(75, 75, 75);")
+    course_title.setMinimumHeight(20)
+
+    session_label = QLabel()
+    session_label.setText(courses[course_data].get("sesi", "No Session Info"))
+    session_label.setStyleSheet("font: 14px; color: rgb(75, 75, 75);")
+
+    status_dot = QFrame()
+    status_dot.setMinimumSize(16, 16)
+    status_dot.setMaximumSize(16, 16)
+    color = courses[course_data].get("status_dot", "rgb(255, 0, 0)")
+    status_dot.setStyleSheet(f"background: {color}; border-radius: 8px")
     
+    class_location = QLabel()
+    lokasi = courses[course_data].get("lokasi", ["No Location", "Info"])
+    class_location.setText(f"Ruangan: {lokasi[0]}{lokasi[1]}")
+    class_location.setStyleSheet("color: rgb(0,0,0); font: 15px")
+    
+    # print("belum le" if courses[course_data]["assignment"].get('isFinished') == False else "udah")
+    notComplete = 0
+    for i in courses[course_data]["assignment"]: 
+        if courses[course_data]["assignment"][i].get('isFinished') == False: notComplete += 1
+    
+    incomplete = QLabel()
+    incomplete.setText(f"Incomplete task: {notComplete}")
+    incomplete.setStyleSheet("color: rgb(0,0,0); font: 12px")
+    
+    separator = QFrame()
+    separator.setMinimumHeight(5)
+    separator.setStyleSheet(f"""
+        background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, 
+                stop:0 {courses[course_data].get("color_id", "#cacaca")[0]}, 
+                stop:1 {courses[course_data].get("color_id", "#cacaca")[1]});
+        border: none;
+    """)
+
+    # Layouting
+    course_layout = QVBoxLayout(course)
+    
+    course_text_wrapper = QFrame()
+    
+    course_top_vertical = QVBoxLayout()
+    
+    course_side_info = QFrame()
+    course_side_info.setObjectName("courseSideInfo")
+    course_side_info.setStyleSheet("""
+#courseSideInfo {
+    border-left: 2px solid rgb(220, 220, 220);
+}
+""")
+    # course_side_info.setMaximumSize(40, 100)
+    
+    assignment_layout = QVBoxLayout()
+    course_side_info.setLayout(assignment_layout)
+    
+    course_top_layout = QHBoxLayout()
+    course_top_layout.setSpacing(10)
+    course_top_layout.addWidget(folder_icon)
+    
+    course_text_layout = QVBoxLayout()
+    course_text_layout.addWidget(course_title)
+    course_text_layout.addWidget(session_label)
+
+    course_top_layout.addWidget(status_dot, alignment=Qt.AlignTop)
+    course_top_layout.addLayout(course_top_vertical)
+    
+    course_text_wrapper.setLayout(course_text_layout)
+    course_top_vertical.addWidget(course_text_wrapper)
+    
+    course_top_layout.addWidget(course_side_info)
+    
+    assignment_layout.addWidget(class_location)
+    assignment_layout.addWidget(incomplete)
+    
+    course_layout.addLayout(course_top_layout)
+    course_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+    course_layout.addWidget(separator)
+    
+    course.mousePressEvent = lambda event: course_clicked_signal(course_data, click_course_btn)
+    
+    course_widgets.append(course)
+
 def create_new_course_form(main_window):
     # Create the dialog
     modal = QDialog(main_window)

@@ -7,7 +7,8 @@ from layout.components.pages.dashboard import Dashboard
 from layout.components.pages.note import Note
 from layout.components.pages.course import Course
 import json
-
+import shutil
+import os
 
 # ==============================================================================
 # ------------------------------INITIALIZE PROGRAM------------------------------
@@ -64,17 +65,19 @@ def setup_course(main_window, ui, course_id):
     course_wrapper.session_lbl.setText(f"<b>Sesi:</b> {courses['sesi']}")
 
     # Header buttons connections
-    # course_wrapper.return_btn.clicked.connect(return_to_dashboard)
+    course_wrapper.return_btn.clicked.connect(lambda: return_to_dashboard(main_window, ui))
     # course_wrapper.edit_btn.clicked.connect(edit_course)
-    # course_wrapper.del_btn.clicked.connect(delete_course)
+    course_wrapper.del_btn.clicked.connect(lambda: delete_course(course_id, main_window, ui))
 
     # # Add to-do and note buttons connections
     # course_wrapper.add_todo_btn.clicked.connect(add_todo)
-    # course_wrapper.add_note_btn.clicked.connect(add_note)
+    # course_wrapper.add_note_btn.clicked.connect(add_note)/
 
     # Construct the to-do and note items
     add_task_frames(assignment, course_wrapper)
-    add_note_frames(note, course_wrapper)
+    
+    for key, notes in note.items():
+        add_note_frames(notes, key, course_id, course_wrapper, main_window, ui)
 
 def add_task_frames(assignment, course_wrapper):
     """Create frames for each task in the JSON data."""
@@ -99,44 +102,68 @@ def add_task_frames(assignment, course_wrapper):
         # Add the frame to the main layout
         course_wrapper.todo_list_lyt.addWidget(frame)
 
-
-def add_note_frames(notes, course_wrapper):
+def add_note_frames(note, key, course_id, course_wrapper, main_window, ui):
     """Create frames for each note in the JSON data."""
-    for key, note in notes.items():
-        title = note.get("title")
-        description = note.get("deskripsi")
-        created_at = note.get("created_at")
+    
+    title = note.get("title")
+    description = note.get("deskripsi")
+    created_at = note.get("created_at")
 
-        # Create a frame for the note
-        frame = QFrame()
-        frame.setFrameShape(QFrame.StyledPanel)
-        frame.setStyleSheet("background-color: lightyellow; padding: 10px; margin: 5px;")
-        layout = QVBoxLayout(frame)
+    # Create a frame for the note
+    frame = QFrame()
+    frame.setFrameShape(QFrame.StyledPanel)
+    frame.setStyleSheet("background-color: lightyellow; padding: 10px; margin: 5px;")
+    layout = QVBoxLayout(frame)
 
-        # Add note details as labels
-        description_lbl = QLabel(f"<b>Isi:</b> {description}")
-        description_lbl.setWordWrap(True)
-        layout.addWidget(QLabel(f"<b>Catatan {key}:</b> {title}"))
-        layout.addWidget(description_lbl)
-        layout.addWidget(QLabel(f"<b>Dibuat pada:</b> {created_at}"))
+    # Add note details as labels
+    description_lbl = QLabel(f"<b>Isi:</b> {description}")
+    description_lbl.setWordWrap(True)
+    layout.addWidget(QLabel(f"<b>Catatan {key}:</b> {title}"))
+    layout.addWidget(description_lbl)
+    layout.addWidget(QLabel(f"<b>Dibuat pada:</b> {created_at}"))
 
-        # Add the frame to the main layout
-        course_wrapper.note_list_lyt.addWidget(frame)
+    course_wrapper.note_list_lyt.addWidget(frame)
+    
+    frame.mousePressEvent = lambda event: setup_note_edit(main_window, ui, course_id, key)
 
+def delete_course(course_id, main_window, ui):
+    reply = QMessageBox.question(
+        None,  # Parent (None means it's a standalone dialog)
+        "Confirm Deletion",
+        f"Are you sure you want to delete the course with ID {course_id}?",
+        QMessageBox.Yes | QMessageBox.No
+    )
+    if reply != QMessageBox.Yes :return print("Cancel penghapusan ")
+    
+    try: 
+        path = f"app/data/courses/{course_id}"
+        os.listdir(path)
+        
+        print("file exists")
+        shutil.rmtree(path)
+        change_page(main_window, ui)
+        
+    except FileNotFoundError: 
+        return print("File not found :(")
+
+def return_to_dashboard(main_window, ui):
+        global page
+        page = 1
+        change_page(main_window, ui)
 
 # ------------------- GET NOTES COMPONENT
 def setup_note_edit(main_window, ui, course_id, note_id): 
     with open(f"app/data/courses/{course_id}/id.json", 'r') as file:
         title = json.load(file)["title"]
         
-    wrapper = Note(main_window, note_id, title, course_id, )
+    wrapper = Note(main_window, note_id, title, course_id, ui, lambda: setup_note_edit(main_window, ui, course_id, note_id))
     ui.mainScroll.setWidget(wrapper)
     ui.gridLayout_2.addWidget(ui.mainScroll, 0, 0, 1, 1)
 
 # ==============================================================================
 # ------------------------------HANDLE PAGE CANGE-------------------------------
 # ==============================================================================
- 
+
 # ------------------- TASKBAR BUTTONS
 def handle_page_toggle(task_id, ui, main_window):
     global page 
@@ -146,23 +173,27 @@ def handle_page_toggle(task_id, ui, main_window):
     current_widget = ui.mainScroll.widget()
     if current_widget:
         current_widget.deleteLater()
+    change_page(main_window, ui)
+    
+def get_course_data(course_id, ui, main_window): 
+    if course_id == 0: 
+        change_page(main_window, ui)
+    else: 
+        current_widget = ui.mainScroll.widget()
+        if current_widget:
+            current_widget.deleteLater()
+        
+        setup_course(main_window, ui, course_id)
 
+def change_page(main_window, ui): 
+    global page 
     if page == 1:
         setup_dashboard(main_window, ui)
-    else:
-        setup_note_edit(main_window, ui, "1", "1")
 
-def get_course_data(course_id, ui, main_window): 
-    current_widget = ui.mainScroll.widget()
-    if current_widget:
-        current_widget.deleteLater()
-    
-    setup_course(main_window, ui, course_id)
-    
 # ==============================================================================
 # ------------------------------STARTING PROGRAM--------------------------------
 # ==============================================================================
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     main_window, ui = setup_ui()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

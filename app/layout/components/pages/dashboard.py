@@ -487,8 +487,9 @@ class Dashboard(QFrame):
                 self.new_course_btn = QPushButton(self.new_course)
                 self.new_course_btn.setObjectName(u"new_course_btn")
                 
-                
                 self.new_course_btn.clicked.connect(self.create_new_course)
+                
+                self.on_course_click(0)
         
         def on_course_click(self, course_id=None): 
                 if self.course_click_callback: 

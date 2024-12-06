@@ -359,17 +359,19 @@ def create_new_course_form(main_window):
 
         # Get the selected color
         selected_color_id = radio_group.checkedId()
-        selected_color = colors.get(str(selected_color_id), ["", ""]) 
+        selected_color = colors.get(str(selected_color_id), ['grey', 'rgb(202, 202, 202)', 'rgb(235, 235, 235)']) 
+        
+        print(selected_color)
         
         for key, value in colors.items():
             if value == selected_color:
                 selected_color = key
                 break
-
+        
         course_identificatio =[course_name, hari, sesi, gedung, f"{lantai}0{ruangan}", selected_color]        
         create_course(course_identificatio)
                 
-        modal.accept()  # Close modal after submission
+        modal.accept()
 
     submit_button.clicked.connect(submit_form)
 

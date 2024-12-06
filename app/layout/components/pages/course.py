@@ -11,6 +11,8 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
     QSizePolicy, QSpacerItem, QStatusBar, QVBoxLayout,
     QWidget)
 
+from controller.course import *
+
 class Course(QFrame):
     def __init__(self, parent=None, course_id=None):
         super().__init__(parent)
@@ -100,7 +102,6 @@ class Course(QFrame):
         self.session_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.horizontalLayout_5.addWidget(self.session_lbl)
-
 
         self.gridLayout_5.addWidget(self.frame_5, 2, 0, 1, 4)
 
@@ -216,12 +217,12 @@ class Course(QFrame):
         # self.statusBar = QStatusBar(MainWindow)
         # self.statusBar.setObjectName(u"statusBar")
         # MainWindow.setStatusBar(self.statusBar)
+        self.add_note_btn.clicked.connect(self.add_new_note)   
 
         self.retranslateUi()
 
         # QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
-
     def retranslateUi(self):
         print("ready")
         # MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Course - Dashboard", None))
@@ -236,3 +237,7 @@ class Course(QFrame):
         self.note_title_btn.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700;\">Notes</span></p></body></html>", None))
         self.add_note_btn.setText(QCoreApplication.translate("MainWindow", u"Tambah Catatan", None))
     # retranslateUi
+    
+    def add_new_note(self): 
+        # print("aosdnasidiansjdanskdnkadnklasn andi nuafal")
+        show_new_note_form()

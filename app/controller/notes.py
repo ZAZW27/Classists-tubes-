@@ -1,4 +1,7 @@
 import json
+import shutil
+
+from PySide6.QtWidgets import QMessageBox
 
 def saveData(data):
     print("fetching data")
@@ -13,3 +16,23 @@ def saveData(data):
     with open(f"app/data/courses/{data[0]}/note.json", "w") as file: 
         json.dump(fetch_data, file, indent=4)
     print("data updated successfully!")
+    
+def deleteNote(course_id, note_id): 
+    reply = QMessageBox.question(
+        None,  # Parent (None means it's a standalone dialog)
+        "Confirm Deletion",
+        f"Are you sure you want to delete the course with ID {course_id}?",
+        QMessageBox.Yes | QMessageBox.No
+    )
+    if reply != QMessageBox.Yes :return print("Cancel penghapusan ")
+    
+    path = f"app/data/courses/{course_id}/notes.json"
+    
+    with open(path, "r") as file: 
+        note_data = json.load(file)
+
+    del note_data[note_id]
+    
+    with open(path, "w") as file: 
+        json.dump(note_data, file, indent=4)
+    

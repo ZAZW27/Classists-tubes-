@@ -7,9 +7,10 @@ from controller.notes import *
 import json
 
 class Note(QFrame):
-        def __init__(self, parent=None, notes_id=None, title="Undefined", id=None):
+        def __init__(self, parent=None, notes_id=None, title="Undefined", id=None, ui=None, setup_note_edit=None):
                 super().__init__(parent)
-                
+                print(f"notes id {notes_id}")
+                print(f"Folder id {id}")
                 with open(f"app/data/courses/{id}/note.json", "r") as file: 
                         notes_data = json.load(file)[notes_id]
                 
@@ -175,10 +176,14 @@ class Note(QFrame):
                 # self.mainScroll.setWidget(self.wrapper)
                 self.wrapper = QWidget(self)
                 
+                self.setup_note_edit = setup_note_edit
+                self.main_window = parent
+                self.ui = ui
                 self.course_id = id
                 self.notes_id = notes_id
                 
                 self.saveEdit.clicked.connect(self.getData)
+                self.deleteBtn.clicked.connect(self.deleteSignal)
 
                 self.retranslateUi(notes_data, title, id)
                 
@@ -196,3 +201,8 @@ class Note(QFrame):
                 # course title, note title, content
                 fecth_data = [self.course_id, self.notes_id, self.notes_title.toPlainText(), self.notes_deskripsi.toPlainText(), self.deadLine.date().toString("dd/MM/yyyy")]
                 saveData(fecth_data)
+        
+        def deleteSignal(self): 
+                deleteNote(self.course_id, self.notes_id)
+                if self.setup_note_edit: 
+                        self.setup_note_edit(self.main_window, self.ui, self.course_id,self.notes_id )

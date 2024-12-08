@@ -159,7 +159,7 @@ def generate_each_course(course_widgets, course_wrapper, course_data, courses, c
     course_title.setMinimumHeight(20)
 
     session_label = QLabel()
-    session_label.setText(courses[course_data].get("sesi", "No Session Info"))
+    session_label.setText(f'{courses[course_data].get("hari", "No hari info")}: {courses[course_data].get("sesi", "No Session Info")}')
     session_label.setStyleSheet("font: 14px; color: rgb(75, 75, 75);")
 
     status_dot = QFrame()

@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QGridLayout, QHBoxLayout,
 from controller.course import *
 
 class Course(QFrame):
-    def __init__(self, parent=None, course_id=None):
+    def __init__(self, parent=None, create_new_note=None, create_new_todo=None):
         super().__init__(parent)
         
         self.setObjectName(u"wrapper")
@@ -209,16 +209,6 @@ class Course(QFrame):
 
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 
-        # self.mainScroll.setWidget(self)
-
-        # self.gridLayout_2.addWidget(self.mainScroll, 0, 0, 1, 1)
-
-        # MainWindow.setCentralWidget(self.centralwidget)
-        # self.statusBar = QStatusBar(MainWindow)
-        # self.statusBar.setObjectName(u"statusBar")
-        # MainWindow.setStatusBar(self.statusBar)
-        self.add_note_btn.clicked.connect(self.add_new_note)   
-
         self.retranslateUi()
 
         # QMetaObject.connectSlotsByName(MainWindow)
@@ -238,6 +228,3 @@ class Course(QFrame):
         self.add_note_btn.setText(QCoreApplication.translate("MainWindow", u"Tambah Catatan", None))
     # retranslateUi
     
-    def add_new_note(self): 
-        # print("aosdnasidiansjdanskdnkadnklasn andi nuafal")
-        show_new_note_form()

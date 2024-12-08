@@ -7,12 +7,17 @@ from controller.notes import *
 import json
 
 class Note(QFrame):
-        def __init__(self, parent=None, notes_id=None, title="Undefined", id=None, ui=None, setup_note_edit=None):
+        def __init__(self, parent=None, notes_id=0, title="Undefined", id=None, ui=None, setup_note_edit=None, return_to_dashboard=None):
                 super().__init__(parent)
                 print(f"notes id {notes_id}")
                 print(f"Folder id {id}")
                 with open(f"app/data/courses/{id}/note.json", "r") as file: 
-                        notes_data = json.load(file)[notes_id]
+                        if int(notes_id) != 0: 
+                                notes_data = json.load(file)[notes_id] 
+                        else: 
+                                notes_data = json.load(file)
+                                for keys in notes_data: new_key = str(int(keys) + 1)
+                        print(notes_data.keys())
                 
                 self.setObjectName(u"note_wrapper")
                 self.setGeometry(0, 0, 679, 1037)
@@ -118,7 +123,7 @@ class Note(QFrame):
                 self.deadLine.setObjectName(u"deadLine")
                 self.deadLine.setStyleSheet(u"font: 18px;")
                 
-                fetchDate = notes_data['created_at']
+                fetchDate = notes_data.get('created_at', "0/00/0000")
                 date_object = QDate.fromString(fetchDate, "d/MM/yyyy")
                 
                 self.deadLine.setDate(date_object) 
@@ -180,10 +185,14 @@ class Note(QFrame):
                 self.main_window = parent
                 self.ui = ui
                 self.course_id = id
-                self.notes_id = notes_id
+                try: 
+                        self.notes_id = notes_id if notes_id != 0 else new_key
+                except UnboundLocalError:
+                        self.notes_id = '1'
                 
                 self.saveEdit.clicked.connect(self.getData)
                 self.deleteBtn.clicked.connect(self.deleteSignal)
+                self.pushButton.clicked.connect(lambda: return_to_dashboard(self.main_window, self.ui, self.course_id))
 
                 self.retranslateUi(notes_data, title, id)
                 
@@ -192,17 +201,19 @@ class Note(QFrame):
                 self.course_title.setText(QCoreApplication.translate("MainWindow", f"{title}", None))
                 self.saveEdit.setText(QCoreApplication.translate("MainWindow", u"\u2713", None))
                 self.deleteBtn.setText(QCoreApplication.translate("MainWindow", u"\u24cd", None))
-                self.notes_title.setText(notes_data['title'])
+                self.notes_title.setText(notes_data.get('title', ""))
                 self.notes_title.setStyleSheet("font: 20px; color: rgb(0, 0,0);")
-                self.notes_deskripsi.setText(notes_data['deskripsi'])
+                self.notes_deskripsi.setText(notes_data.get('deskripsi', ""))
                 self.notes_deskripsi.setStyleSheet("font: 14px; color: rgb(0, 0,0);")
 
         def getData(self): 
                 # course title, note title, content
-                fecth_data = [self.course_id, self.notes_id, self.notes_title.toPlainText(), self.notes_deskripsi.toPlainText(), self.deadLine.date().toString("dd/MM/yyyy")]
-                saveData(fecth_data)
+                fetch_data = [self.course_id, self.notes_id, self.notes_title.toPlainText(), self.notes_deskripsi.toPlainText(), self.deadLine.date().toString("dd/MM/yyyy")]
+                saveData(fetch_data)
+                if self.setup_note_edit: 
+                        self.setup_note_edit(self.main_window, self.ui, self.course_id )
         
         def deleteSignal(self): 
                 deleteNote(self.course_id, self.notes_id)
                 if self.setup_note_edit: 
-                        self.setup_note_edit(self.main_window, self.ui, self.course_id,self.notes_id )
+                        self.setup_note_edit(self.main_window, self.ui, self.course_id )

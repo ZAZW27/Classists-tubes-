@@ -10,6 +10,8 @@ import json
 import shutil
 import os
 
+from controller.course import *
+
 # ==============================================================================
 # ------------------------------INITIALIZE PROGRAM------------------------------
 # ==============================================================================
@@ -32,21 +34,24 @@ def setup_ui():
 # ------------------------------GETTING COMPONENT-------------------------------
 # ==============================================================================
 
-# ------------------- GET TASKBAR COMPONENT
+# NOTE =====---=====---=====---=====---=====---=====---===== GET TASKBAR COMPONENT
+
 def setup_taskbar(main_window, ui): 
     task_bar = TaskBar(main_window, task_click_callback=lambda task_id: handle_page_toggle(task_id, ui, main_window))
 
     ui.gridLayout_2.addWidget(task_bar, 1, 0, 1, 1)
 
-# ------------------- GET DASHBOARD COMPONENT
+# NOTE =====---=====---=====---=====---=====---=====---===== GET DASHBOARD COMPONENT
+
 def setup_dashboard(main_window, ui):
     wrapper = Dashboard(main_window, course_click_callback=lambda course_id: get_course_data(course_id, ui, main_window))
     ui.mainScroll.setWidget(wrapper)
     ui.gridLayout_2.addWidget(ui.mainScroll, 0, 0, 1, 1)
 
-# ------------------- GET COURSE COMPONENT
+# NOTE =====---=====---=====---=====---=====---=====---===== GET COURSE COMPONENT
+
 def setup_course(main_window, ui, course_id): 
-    course_wrapper = Course(main_window, course_id)
+    course_wrapper = Course(main_window)
     ui.mainScroll.setWidget(course_wrapper)
     
     with open(f"app/data/courses/{course_id}/assignment.json", 'r') as file:
@@ -66,12 +71,12 @@ def setup_course(main_window, ui, course_id):
 
     # Header buttons connections
     course_wrapper.return_btn.clicked.connect(lambda: return_to_dashboard(main_window, ui))
-    # course_wrapper.edit_btn.clicked.connect(edit_course)
+    course_wrapper.edit_btn.clicked.connect(lambda: edit_course(main_window, ui, course_id))
     course_wrapper.del_btn.clicked.connect(lambda: delete_course(course_id, main_window, ui))
 
     # # Add to-do and note buttons connections
     # course_wrapper.add_todo_btn.clicked.connect(add_todo)
-    # course_wrapper.add_note_btn.clicked.connect(add_note)/
+    course_wrapper.add_note_btn.clicked.connect(lambda: add_note(main_window, ui, course_id))
 
     # Construct the to-do and note items
     add_task_frames(assignment, course_wrapper)
@@ -126,6 +131,10 @@ def add_note_frames(note, key, course_id, course_wrapper, main_window, ui):
     
     frame.mousePressEvent = lambda event: setup_note_edit(main_window, ui, course_id, key)
 
+def add_note(main_window, ui, course_id):
+    print("Creating new note")
+    setup_note_edit(main_window, ui, course_id)
+
 def delete_course(course_id, main_window, ui):
     reply = QMessageBox.question(
         None,  # Parent (None means it's a standalone dialog)
@@ -146,17 +155,20 @@ def delete_course(course_id, main_window, ui):
     except FileNotFoundError: 
         return print("File not found :(")
 
-def return_to_dashboard(main_window, ui):
-        global page
-        page = 1
-        change_page(main_window, ui)
+def edit_course(main_window, ui, course_id): 
+    edit_course_form(main_window, course_id)
+    
+# NOTE =====---=====---=====---=====---=====---=====---===== GET NOTES COMPONENT
 
-# ------------------- GET NOTES COMPONENT
-def setup_note_edit(main_window, ui, course_id, note_id): 
+def setup_note_edit(main_window, ui, course_id, note_id=0): 
     with open(f"app/data/courses/{course_id}/id.json", 'r') as file:
         title = json.load(file)["title"]
         
-    wrapper = Note(main_window, note_id, title, course_id, ui, lambda: setup_note_edit(main_window, ui, course_id, note_id))
+    wrapper = Note(
+                main_window, note_id, title, course_id, ui, 
+                lambda main_window, ui, course_id: setup_course(main_window, ui, course_id), 
+                lambda main_window, ui, course_id :setup_course(main_window, ui, course_id)
+            )
     ui.mainScroll.setWidget(wrapper)
     ui.gridLayout_2.addWidget(ui.mainScroll, 0, 0, 1, 1)
 
@@ -164,7 +176,8 @@ def setup_note_edit(main_window, ui, course_id, note_id):
 # ------------------------------HANDLE PAGE CANGE-------------------------------
 # ==============================================================================
 
-# ------------------- TASKBAR BUTTONS
+# NOTE =====---=====---=====---=====---=====---=====---===== TASKBAR BUTTONS
+
 def handle_page_toggle(task_id, ui, main_window):
     global page 
     print(f"Task clicked: {task_id}")
@@ -189,6 +202,11 @@ def change_page(main_window, ui):
     global page 
     if page == 1:
         setup_dashboard(main_window, ui)
+
+def return_to_dashboard(main_window, ui):
+        global page
+        page = 1
+        change_page(main_window, ui)
 
 # ==============================================================================
 # ------------------------------STARTING PROGRAM--------------------------------

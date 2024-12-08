@@ -135,7 +135,10 @@ def edit_course_form(main_window, course_id):
             row += 1
     
     current_color = int(data.get("color_id", "1")) - 1
-    checkColor[(current_color)].setChecked(True)
+    try: 
+        checkColor[(current_color)].setChecked(True)
+    except IndexError:
+        checkColor[7].setChecked(True)
     
     # Add the color grid layout to the form layout
     form_layout.addRow("Select Color:", color_grid_layout)

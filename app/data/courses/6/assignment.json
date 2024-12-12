@@ -1,1 +1,21 @@
-{}
+{
+    "1": {
+        "title": "Pekerjaan mendesak",
+        "deskripsi": "Apa yang harus dilakukan sekarang?",
+        "deadline": "15/12/2024",
+        "isFinished": false
+    },
+    "5": {
+        "title": "Proyek individu",
+        "deskripsi": "Tugas ini butuh banyak riset!",
+        "deadline": "20/12/2024",
+        "isFinished": false
+    }, 
+    "4": {
+        "title": "Laporan etnisitas",
+        "deskripsi": "Tulis ulasan tentang keberagaman budaya di Indonesia.",
+        "deadline": "5/12/2024",
+        "isFinished": false
+    }
+
+}

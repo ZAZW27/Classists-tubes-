@@ -3,23 +3,22 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from controller.notes import *
+from controller.todo import *
 import json
 
-class Note(QFrame):
-        def __init__(self, parent=None, notes_id=0, title="Undefined", id=None, ui=None, setup_note_edit=None, setup_course=None):
+class Todo(QFrame):
+        def __init__(self, parent=None, todo_id=0, title="Undefined", id=None, ui=None, setup_todo_edit=None, setup_course=None):
                 super().__init__(parent)
-                print(f"notes id {notes_id}")
-                print(f"Folder id {id}")
-                with open(f"app/data/courses/{id}/note.json", "r") as file: 
-                        if int(notes_id) != 0: 
-                                notes_data = json.load(file)[notes_id] 
-                        else: 
-                                notes_data = json.load(file)
-                                for keys in notes_data: new_key = str(int(keys) + 1)
-                        print(notes_data.keys())
                 
-                self.setObjectName(u"note_wrapper")
+                with open(f"app/data/courses/{id}/assignment.json", "r") as file: 
+                        if int(todo_id) != 0: 
+                                todo_data = json.load(file)[todo_id] 
+                        else: 
+                                todo_data = json.load(file)
+                                for keys in todo_data: new_key = str(int(keys) + 1)
+                        print(todo_data.keys())
+                
+                self.setObjectName(u"todo_wrapper")
                 self.setGeometry(0, 0, 679, 1037)
                 self.gridLayout = QGridLayout(self)
                 self.gridLayout.setObjectName(u"gridLayout")
@@ -119,11 +118,19 @@ class Note(QFrame):
                 self.bottom.setFrameShadow(QFrame.Raised)
                 self.verticalLayout_3 = QVBoxLayout(self.bottom)
                 self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+                
+                self.isFinished = todo_data['isFinished']
+                
+                self.completeBtn = QPushButton(self.bottom)
+                self.completeBtn.setObjectName("complete")
+
+                self.verticalLayout_3.addWidget(self.completeBtn)
+                
                 self.deadLine = QDateEdit(self.bottom)
                 self.deadLine.setObjectName(u"deadLine")
                 self.deadLine.setStyleSheet(u"font: 18px;")
                 
-                fetchDate = notes_data.get('created_at', "0/00/0000")
+                fetchDate = todo_data.get('deadline', "0/00/0000")
                 date_object = QDate.fromString(fetchDate, "d/MM/yyyy")
                 
                 self.deadLine.setDate(date_object) 
@@ -131,16 +138,16 @@ class Note(QFrame):
 
                 self.verticalLayout_3.addWidget(self.deadLine)
 
-                self.notes_title = QTextEdit(self.bottom)
-                self.notes_title.setObjectName(u"textEdit")
+                self.todos_title = QTextEdit(self.bottom)
+                self.todos_title.setObjectName(u"textEdit")
                 sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
                 sizePolicy2.setHorizontalStretch(0)
                 sizePolicy2.setVerticalStretch(0)
-                sizePolicy2.setHeightForWidth(self.notes_title.sizePolicy().hasHeightForWidth())
-                self.notes_title.setSizePolicy(sizePolicy2)
-                self.notes_title.setMaximumSize(QSize(16777215, 50))
+                sizePolicy2.setHeightForWidth(self.todos_title.sizePolicy().hasHeightForWidth())
+                self.todos_title.setSizePolicy(sizePolicy2)
+                self.todos_title.setMaximumSize(QSize(16777215, 50))
 
-                self.verticalLayout_3.addWidget(self.notes_title)
+                self.verticalLayout_3.addWidget(self.todos_title)
 
 
                 self.verticalLayout_2.addWidget(self.bottom)
@@ -162,11 +169,11 @@ class Note(QFrame):
                 self.frame_2.setFrameShadow(QFrame.Raised)
                 self.verticalLayout_4 = QVBoxLayout(self.frame_2)
                 self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-                self.notes_deskripsi = QTextEdit(self.frame_2)
-                self.notes_deskripsi.setObjectName(u"notes_deskripsi")
-                self.notes_deskripsi.setStyleSheet(u"")
+                self.todos_deskripsi = QTextEdit(self.frame_2)
+                self.todos_deskripsi.setObjectName(u"todos_deskripsi")
+                self.todos_deskripsi.setStyleSheet(u"")
 
-                self.verticalLayout_4.addWidget(self.notes_deskripsi)
+                self.verticalLayout_4.addWidget(self.todos_deskripsi)
 
 
                 self.horizontalLayout_4.addWidget(self.frame_2)
@@ -180,37 +187,39 @@ class Note(QFrame):
                 # self.mainScroll.setWidget(self.wrapper)
                 self.wrapper = QWidget(self)
                 
-                self.setup_note_edit = setup_note_edit
+                self.setup_todo_edit = setup_todo_edit
                 self.main_window = parent
                 self.ui = ui
                 self.course_id = id
                 try: 
-                        self.notes_id = notes_id if notes_id != 0 else new_key
+                        self.todo_id = todo_id if todo_id != 0 else new_key
                 except UnboundLocalError:
-                        self.notes_id = '1'
+                        self.todo_id = '1'
                 
                 self.saveEdit.clicked.connect(self.getData)
                 self.deleteBtn.clicked.connect(self.deleteSignal)
                 self.pushButton.clicked.connect(lambda: setup_course(self.main_window, self.ui, self.course_id))
+                self.completeBtn.clicked.connect(self.finishedBtn)
 
-                self.retranslateUi(notes_data, title, id)
+                self.retranslateUi(todo_data, title, id)
+                self.setButtonStyle()
                 
-        def retranslateUi(self, notes_data, title, id):
+        def retranslateUi(self, todo_data, title, id):
                 self.pushButton.setText(QCoreApplication.translate("MainWindow", u"\u2190", None))
                 self.course_title.setText(QCoreApplication.translate("MainWindow", f"{title}", None))
                 self.saveEdit.setText(QCoreApplication.translate("MainWindow", u"\u2713", None))
                 self.deleteBtn.setText(QCoreApplication.translate("MainWindow", u"\u24cd", None))
-                self.notes_title.setText(notes_data.get('title', ""))
-                self.notes_title.setStyleSheet("font: 20px; color: rgb(0, 0,0);")
-                self.notes_deskripsi.setText(notes_data.get('deskripsi', ""))
-                self.notes_deskripsi.setStyleSheet("font: 14px; color: rgb(0, 0,0);")
+                self.todos_title.setText(todo_data.get('title', ""))
+                self.todos_title.setStyleSheet("font: 20px; color: rgb(0, 0,0);")
+                self.todos_deskripsi.setText(todo_data.get('deskripsi', ""))
+                self.todos_deskripsi.setStyleSheet("font: 14px; color: rgb(0, 0,0);")
 
         def getData(self): 
-                # course title, note title, content
-                fetch_data = [self.course_id, self.notes_id, self.notes_title.toPlainText(), self.notes_deskripsi.toPlainText(), self.deadLine.date().toString("dd/MM/yyyy")]
+                # course title, todo title, content
+                fetch_data = [self.course_id, self.todo_id, self.todos_title.toPlainText(), self.todos_deskripsi.toPlainText(), self.deadLine.date().toString("dd/MM/yyyy"), self.completeBtn.text()]
                 saveData(fetch_data)
-                if self.setup_note_edit: 
-                        self.setup_note_edit(self.main_window, self.ui, self.course_id )
+                if self.setup_todo_edit: 
+                        self.setup_todo_edit(self.main_window, self.ui, self.course_id )
         
         def deleteSignal(self): 
                 reply = QMessageBox.question(
@@ -222,6 +231,30 @@ class Note(QFrame):
                 
                 if reply != QMessageBox.Yes :return print("Cancel penghapusan ")
                 
-                deleteNote(self.course_id, self.notes_id)
-                if self.setup_note_edit: 
-                        self.setup_note_edit(self.main_window, self.ui, self.course_id )
+                deleteTodo(self.course_id, self.todo_id)
+                if self.setup_todo_edit: 
+                        self.setup_todo_edit(self.main_window, self.ui, self.course_id )
+                        
+        def setButtonStyle(self): 
+                self.completeBtn.setText("Complete" if self.isFinished == True else "Incomplete")
+                self.completeBtn.setStyleSheet(f"""
+                #complete {{
+                        background-color: {'#10b981' if self.isFinished == True else '#dc2626'}; /* (#dc2626 Jika belum) (#10b981 jika benar)*/ 
+                        color: white;             
+                        border-radius: 15px;      
+                        font-size: 16px;          
+                        padding: 8px 16px;
+                        font-weight: 500;
+                }}
+                #complete:hover {{
+                        background-color: {'#16c784' if self.isFinished == True else '#ef4444'};
+                }}
+                #complete:pressed {{
+                        background-color: {'#0d955f' if self.isFinished == True else '#b91c1c'};
+                }}
+                """)
+        def finishedBtn(self): 
+                self.isFinished =  not self.isFinished
+                
+                saveIsFinished(self.course_id, self.todo_id, self.isFinished)
+                self.setButtonStyle()

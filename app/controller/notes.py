@@ -13,20 +13,13 @@ def saveData(data):
     fetch_data[data[1]]["title"] = data[2]
     fetch_data[data[1]]["deskripsi"] = data[3]
     fetch_data[data[1]]["created_at"] = data[4]
+    fetch_data[data[1]]["created_at"] = data[4]
     
     with open(f"app/data/courses/{data[0]}/note.json", "w") as file: 
         json.dump(fetch_data, file, indent=4)
     print("data updated successfully!")
     
 def deleteNote(course_id, note_id): 
-    reply = QMessageBox.question(
-        None,  # Parent (None means it's a standalone dialog)
-        "Confirm Deletion",
-        f"Are you sure you want to delete the course with ID {course_id}?",
-        QMessageBox.Yes | QMessageBox.No
-    )
-    if reply != QMessageBox.Yes :return print("Cancel penghapusan ")
-    
     path = f"app/data/courses/{course_id}/note.json"
     
     with open(path, "r") as file: 

@@ -8,10 +8,11 @@ from PySide6.QtSvg import *
 from controller.dashboard import *
 
 class Dashboard(QFrame):
-        def __init__(self, parent=None, course_click_callback=None):
+        def __init__(self, parent=None, ui=None, course_click_callback=None, assignment_click_callback=None):
                 super().__init__(parent)
                 
                 self.course_click_callback = course_click_callback
+                self.assignment_click_callback = assignment_click_callback
                 
                 self.setObjectName(u"wrapper")
                 self.setGeometry(QRect(0, 0, 679, 1037))
@@ -170,32 +171,15 @@ class Dashboard(QFrame):
                 self.ass_scroll_wrapper.setGeometry(QRect(0, 0, 628, 60))
                 self.assignments_horizontal_layout = QHBoxLayout(self.ass_scroll_wrapper)
                 self.assignments_horizontal_layout.setObjectName(u"assignments_horizontal_layout")
-                self.Assignments_container = QWidget(self.ass_scroll_wrapper)
-                self.Assignments_container.setObjectName(u"Assignments_container")
-                sizePolicy2 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Maximum)
-                sizePolicy2.setHorizontalStretch(0)
-                sizePolicy2.setVerticalStretch(0)
-                sizePolicy2.setHeightForWidth(self.Assignments_container.sizePolicy().hasHeightForWidth())
-                self.Assignments_container.setSizePolicy(sizePolicy2)
-                self.Assignments_container.setMinimumSize(QSize(150, 0))
-                self.Assignments_container.setStyleSheet(u"background: rgb(30, 229, 166);")
-                self.gridLayout_17 = QGridLayout(self.Assignments_container)
-                self.gridLayout_17.setObjectName(u"gridLayout_17")
-                self.ass_text = QLabel(self.Assignments_container)
-                self.ass_text.setObjectName(u"ass_text")
-                sizePolicy3 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
-                sizePolicy3.setHorizontalStretch(0)
-                sizePolicy3.setVerticalStretch(0)
-                sizePolicy3.setHeightForWidth(self.ass_text.sizePolicy().hasHeightForWidth())
-                self.ass_text.setSizePolicy(sizePolicy3)
-                self.ass_text.setStyleSheet(u"font: 500 14px \"Arial\";\n"
-        "color: rgb(75, 75, 75);")
-                self.ass_text.setAlignment(Qt.AlignCenter)
-
-                self.gridLayout_17.addWidget(self.ass_text, 0, 0, 1, 1)
-                self.ass_text.setText(QCoreApplication.translate("MainWindow", u"UK 9 20 soal", None))
-
-                self.assignments_horizontal_layout.addWidget(self.Assignments_container)
+                
+                self.main_window = parent
+                self.ui = ui
+                
+                
+                assignment_data = get_today_ass()
+                for data in assignment_data:
+                        widget = create_due_ass_widget(self.ass_scroll_wrapper, data, get_assignment=lambda course_id, todo_id: self.callback_assignment(course_id, todo_id))
+                        self.assignments_horizontal_layout.addWidget(widget)                
 
                 self.assignments_scroll.setWidget(self.ass_scroll_wrapper)
 
@@ -494,4 +478,7 @@ class Dashboard(QFrame):
         def on_course_click(self, course_id=None): 
                 if self.course_click_callback: 
                         self.course_click_callback(course_id)
-        
+                        
+        def  callback_assignment(self, course_id, todo_id):
+                if self.assignment_click_callback: 
+                        self.assignment_click_callback(self.main_window, self.ui, course_id, todo_id)

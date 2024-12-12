@@ -414,3 +414,72 @@ def create_course(course_id):
         json.dump(write_data, file, indent=4)
 
     print(write_data)
+    
+def get_today_ass():   
+    locale.setlocale(locale.LC_TIME, "id_ID.UTF-8")  
+    path = "app/data/courses"
+    courses = os.listdir(path)
+
+    now = datetime.now()
+    # now = datetime.now() + timedelta(days=1)
+    current_day = now.strftime("%A").lower()
+
+    todays_course_data = []
+
+    with open("app/data/colors.json", 'r') as file: 
+        color_data = json.load(file)
+
+    for course in courses: 
+        with open(f"{path}/{course}/id.json", 'r') as file: 
+            id_data = json.load(file)
+        if id_data['hari'] != current_day: continue
+        
+        with open(f"{path}/{course}/assignment.json", 'r') as fileData: 
+            ass_data = json.load(fileData)
+
+        for assignment in ass_data: 
+            if ass_data[assignment]['isFinished'] == False: 
+                todays_course_data.append(
+                    [
+                    course, 
+                    assignment, 
+                    ass_data[assignment]['title'], 
+                    color_data[id_data['color_id']][1]
+                    ])
+
+    return todays_course_data
+    
+    
+def create_due_ass_widget(parent, data, get_assignment=None):
+    assignment_container = QWidget(parent)
+    assignment_container.setObjectName("Assignments_container")
+    sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Maximum)
+    sizePolicy.setHorizontalStretch(0)
+    sizePolicy.setVerticalStretch(0)
+    sizePolicy.setHeightForWidth(assignment_container.sizePolicy().hasHeightForWidth())
+    assignment_container.setSizePolicy(sizePolicy)
+    assignment_container.setMinimumSize(QSize(150, 0))
+    assignment_container.setStyleSheet(f"background: {data[3]};")
+    
+    grid_layout = QGridLayout(assignment_container)
+    grid_layout.setObjectName("gridLayout_17")
+    
+    ass_text = QLabel(assignment_container)
+    ass_text.setObjectName("ass_text")
+    sizePolicy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+    sizePolicy.setHorizontalStretch(0)
+    sizePolicy.setVerticalStretch(0)
+    sizePolicy.setHeightForWidth(ass_text.sizePolicy().hasHeightForWidth())
+    ass_text.setSizePolicy(sizePolicy)
+    ass_text.setStyleSheet("font: 500 14px \"Arial\";\ncolor: rgb(75, 75, 75);")
+    ass_text.setAlignment(Qt.AlignCenter)
+    ass_text.setText(QCoreApplication.translate("MainWindow", data[2], None))
+    
+    grid_layout.addWidget(ass_text, 0, 0, 1, 1)
+    
+    ass_text.mousePressEvent = lambda event: throw_back_data(data[0], data[1], get_assignment)
+    
+    return assignment_container
+
+def throw_back_data(course_id, todo_id, get_assignment): 
+    get_assignment(course_id, todo_id)

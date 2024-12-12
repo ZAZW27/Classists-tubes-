@@ -1,11 +1,17 @@
 import sys
 from PySide6.QtWidgets import *
 from PySide6.QtCore import QSize
+import time
+
 from layout.index import Ui_MainWindow
 from layout.components.taskbar import TaskBar  
 from layout.components.pages.dashboard import Dashboard
 from layout.components.pages.note import Note
 from layout.components.pages.course import Course
+from layout.components.pages.todo import Todo
+from layout.components.pages.incomplete import Incomplete
+from layout.components.pages.notification import Notif
+
 import json
 import shutil
 import os
@@ -17,17 +23,20 @@ from controller.course import *
 # ==============================================================================
 page = 1
 def setup_ui():
+    
     main_window = QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(main_window)  # Memanggil setupUI dari index.py
 
     setup_dashboard(main_window, ui)
-    # setup_note_edit(main_window, ui)
 
     # GETTING TASKBAR
     setup_taskbar(main_window, ui)
 
     main_window.show()
+    
+    time.sleep(1)
+    Notif(main_window, ui, check_assignment=lambda main_window, ui, course_id, todo_id:setup_todo_edit(main_window, ui, course_id, todo_id))
     return main_window, ui  # Return both the main_window and ui
 
 # ==============================================================================
@@ -44,7 +53,19 @@ def setup_taskbar(main_window, ui):
 # NOTE =====---=====---=====---=====---=====---=====---===== GET DASHBOARD COMPONENT
 
 def setup_dashboard(main_window, ui):
-    wrapper = Dashboard(main_window, course_click_callback=lambda course_id: get_course_data(course_id, ui, main_window))
+    wrapper = Dashboard(
+        main_window, 
+        ui, 
+        course_click_callback=lambda course_id: get_course_data(course_id, ui, main_window), 
+        assignment_click_callback=lambda main_window, ui, course_id, todo_id:setup_todo_edit(main_window, ui, course_id, todo_id)
+        )
+    ui.mainScroll.setWidget(wrapper)
+    ui.gridLayout_2.addWidget(ui.mainScroll, 0, 0, 1, 1)
+    
+# NOTE =====---=====---=====---=====---=====---=====---===== GET INCOMPLETE COMPONENT
+
+def setup_incomplete(main_window, ui):
+    wrapper = Incomplete(main_window, lambda course_id, todo_id:setup_todo_edit(main_window, ui, course_id, todo_id))
     ui.mainScroll.setWidget(wrapper)
     ui.gridLayout_2.addWidget(ui.mainScroll, 0, 0, 1, 1)
 
@@ -71,41 +92,43 @@ def setup_course(main_window, ui, course_id):
 
     # Header buttons connections
     course_wrapper.return_btn.clicked.connect(lambda: return_to_dashboard(main_window, ui))
-    course_wrapper.edit_btn.clicked.connect(lambda: edit_course(main_window, ui, course_id))
+    course_wrapper.edit_btn.clicked.connect(lambda: edit_course_form(main_window, course_id))
     course_wrapper.del_btn.clicked.connect(lambda: delete_course(course_id, main_window, ui))
 
     # # Add to-do and note buttons connections
-    # course_wrapper.add_todo_btn.clicked.connect(add_todo)
-    course_wrapper.add_note_btn.clicked.connect(lambda: add_note(main_window, ui, course_id))
-
-    # Construct the to-do and note items
-    add_task_frames(assignment, course_wrapper)
+    course_wrapper.add_todo_btn.clicked.connect(lambda: setup_todo_edit(main_window, ui, course_id))
+    course_wrapper.add_note_btn.clicked.connect(lambda: setup_note_edit(main_window, ui, course_id))
     
+    for key, assignments in assignment.items():
+        add_task_frames(assignments, key, course_id, course_wrapper, main_window, ui)
+        
     for key, notes in note.items():
         add_note_frames(notes, key, course_id, course_wrapper, main_window, ui)
+        
 
-def add_task_frames(assignment, course_wrapper):
+def add_task_frames(task, key, course_id, course_wrapper, main_window, ui):
     """Create frames for each task in the JSON data."""
-    for key, task in assignment.items():
-        title = task.get("title")
-        description = task.get("deskripsi")
-        deadline = task.get("deadline")
-        is_finished = task.get("isFinished")
+    title = task.get("title")
+    description = task.get("deskripsi")
+    deadline = task.get("deadline")
+    is_finished = task.get("isFinished")
 
-        # Create a frame for the task
-        frame = QFrame()
-        frame.setFrameShape(QFrame.StyledPanel)
-        frame.setStyleSheet("background-color: lightyellow; padding: 10px; margin: 5px;")
-        layout = QVBoxLayout(frame)
+    # Create a frame for the task
+    frame = QFrame()
+    frame.setFrameShape(QFrame.StyledPanel)
+    frame.setStyleSheet("background-color: lightyellow; padding: 10px; margin: 5px;")
+    layout = QVBoxLayout(frame)
 
-        # Add task details as labels
-        layout.addWidget(QLabel(f"<b>Tugas {key}:</b> {title}"))
-        layout.addWidget(QLabel(f"<b>Deskripsi:</b> {description}"))
-        layout.addWidget(QLabel(f"<b>Tenggat pengumpulan:</b> {deadline}"))
-        layout.addWidget(QLabel(f"<b>Ditandai selesai:</b> {'Ya' if is_finished else 'Tidak'}"))
+    # Add task details as labels
+    layout.addWidget(QLabel(f"<b>Tugas {key}:</b> {title}"))
+    layout.addWidget(QLabel(f"<b>Deskripsi:</b> {description}"))
+    layout.addWidget(QLabel(f"<b>Tenggat pengumpulan:</b> {deadline}"))
+    layout.addWidget(QLabel(f"<b>Ditandai selesai:</b> {'Ya' if is_finished else 'Tidak'}"))
 
-        # Add the frame to the main layout
-        course_wrapper.todo_list_lyt.addWidget(frame)
+    # Add the frame to the main layout
+    course_wrapper.todo_list_lyt.addWidget(frame)
+    
+    frame.mousePressEvent = lambda event: setup_todo_edit(main_window, ui, course_id, key)
 
 def add_note_frames(note, key, course_id, course_wrapper, main_window, ui):
     """Create frames for each note in the JSON data."""
@@ -131,10 +154,6 @@ def add_note_frames(note, key, course_id, course_wrapper, main_window, ui):
     
     frame.mousePressEvent = lambda event: setup_note_edit(main_window, ui, course_id, key)
 
-def add_note(main_window, ui, course_id):
-    print("Creating new note")
-    setup_note_edit(main_window, ui, course_id)
-
 def delete_course(course_id, main_window, ui):
     reply = QMessageBox.question(
         None,  # Parent (None means it's a standalone dialog)
@@ -153,10 +172,7 @@ def delete_course(course_id, main_window, ui):
         change_page(main_window, ui)
         
     except FileNotFoundError: 
-        return print("File not found :(")
-
-def edit_course(main_window, ui, course_id): 
-    edit_course_form(main_window, course_id)
+        return print("File not found :(")    
     
 # NOTE =====---=====---=====---=====---=====---=====---===== GET NOTES COMPONENT
 
@@ -167,7 +183,21 @@ def setup_note_edit(main_window, ui, course_id, note_id=0):
     wrapper = Note(
                 main_window, note_id, title, course_id, ui, 
                 lambda main_window, ui, course_id: setup_course(main_window, ui, course_id), 
-                lambda main_window, ui, course_id :setup_course(main_window, ui, course_id)
+                lambda main_window, ui, course_id: setup_course(main_window, ui, course_id)
+            )
+    ui.mainScroll.setWidget(wrapper)
+    ui.gridLayout_2.addWidget(ui.mainScroll, 0, 0, 1, 1)
+
+# NOTE =====---=====---=====---=====---=====---=====---===== GET TODOS COMPONENT
+
+def setup_todo_edit(main_window, ui, course_id, todo_id=0): 
+    with open(f"app/data/courses/{course_id}/id.json", 'r') as file:
+        title = json.load(file)["title"]
+        
+    wrapper = Todo(
+                main_window, todo_id, title, course_id, ui, 
+                lambda main_window, ui, course_id: setup_course(main_window, ui, course_id), 
+                lambda main_window, ui, course_id: setup_course(main_window, ui, course_id)
             )
     ui.mainScroll.setWidget(wrapper)
     ui.gridLayout_2.addWidget(ui.mainScroll, 0, 0, 1, 1)
@@ -183,6 +213,7 @@ def handle_page_toggle(task_id, ui, main_window):
     print(f"Task clicked: {task_id}")
 
     page = task_id
+    print(page)
     current_widget = ui.mainScroll.widget()
     if current_widget:
         current_widget.deleteLater()
@@ -202,6 +233,8 @@ def change_page(main_window, ui):
     global page 
     if page == 1:
         setup_dashboard(main_window, ui)
+    elif page == 2: 
+        setup_incomplete(main_window, ui)
 
 def return_to_dashboard(main_window, ui):
         global page
